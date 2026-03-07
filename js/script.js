@@ -33,3 +33,7 @@ document.querySelectorAll(".sideMenu a").forEach(link => {
         this.classList.add("activo");
     });
 });
+
+function returnToDashboard() {
+    window.location.href = "../admin_view.html";
+}
