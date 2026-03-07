@@ -2,23 +2,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empresa</title>
-    <link rel="stylesheet" href="../css/estilos.css">
-    <script src="../js/script.js" defer></script>
+    <title>Admin-Alumno 3</title>
+    <link rel="stylesheet" href="../../css/estilos.css">
+    <script src="../../js/script.js" defer></script>
 </head>
 <body>
     <div class="Paneles">
         <div class="dashboard">
-            <h1>Panel de la Empresa</h1>
+            <h1>Panel del Administrador</h1>
         </div>
         <div class="cuerpo">
             <div class="sideMenu">
-                <a href="#">Requisitos</a>
-                <a href="#">Solicitudes</a>
-                <a href="#">Becarios</a>
+                <a href="#">Alumnos</a>
+                <a href="#">Empresas</a>
+                <a href="#">Aprovación de vacantes</a>
                 <hr>
-                <a href="#">Perfil de la empresa</a>
-                <a href="#">Mural de vacantes</a>
+                <a href="#">Alumnos en empresas</a>
                 <hr>
                 <a href="login_view.html">Cerrar sesión</a>
             </div>
@@ -26,59 +25,51 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Nombre</th>
-                        <th>CV</th>
+                        <th>Documento</th>
                         <th>Estado</th>
+                        <th>Aprobación</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Alumno 1</td>
-                        <td>
-                            <a href="">cv_alumno1.pdf</a>
-                        </td>    
+                        <td>Registro</td>
+                        <td>Aprovado</td>
                         <td>
                             <button type="button">Aceptar</button><button type="button">Rechazar</button>
                         </td>
                     </tr>
                     <tr>
-                        <td>Alumno 2</td>
-                        <td>
-                            <a href="">cv_alumno2.pdf</a>
-                        </td>    
+                        <td><a href="">Carta compromiso</a></td>
+                        <td>Aprobado</td>
                         <td>
                             <button type="button">Aceptar</button><button type="button">Rechazar</button>
                         </td>
                     </tr>
                     <tr>
-                        <td>Alumno 3</td>
-                        <td>
-                            <a href="">cv_alumno3.pdf</a>
-                        </td>    
+                        <td><a href="">Carta presentación</a></td>
+                        <td>Rechazado</td>
                         <td>
                             <button type="button">Aceptar</button><button type="button">Rechazar</button>
                         </td>
                     </tr>
                     <tr>
-                        <td>Alumno 4</td>
-                        <td>
-                            <a href="">cv_alumno4.pdf</a>
-                        </td>    
+                        <td><a href="">Evaluación de unidad receptora</a></td>
+                        <td>Pendiente</td>
                         <td>
                             <button type="button">Aceptar</button><button type="button">Rechazar</button>
                         </td>
                     </tr>
                     <tr>
-                        <td>Alumno 5</td>
-                        <td>
-                            <a href="">cv_alumno5.pdf</a>
-                        </td>    
+                        <td><a href="">Carta de termino</a></td>
+                        <td>Pendiente</td>
                         <td>
                             <button type="button">Aceptar</button><button type="button">Rechazar</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
+            <br>
+            <button type="button" onclick="returnToDashboard()">Regresar</button>
         </div>
     </div>
 </body>
