@@ -16,15 +16,38 @@ function mostrarTab(tab) {
   }
 }
 
-function validarRegistro() {
-  const correo = document.getElementById("correo").value.trim();
-  if(correo == "admin@prueba.com") {
-    window.location.href = "admin_view.html";
-  }else if(correo == "alumno@prueba.com") {
-    window.location.href = "dashboardAlumno_view.html";
-  }else if(correo == "empresa@prueba.com") {
-    window.location.href = "dashboardEmpresa_view.html";
-  }
+// función para manejar el inicio de sesión
+async function iniciarSesion() {
+    const correo = document.getElementById("correo").value.trim(); //Toma el valor del correo y elimina espacios
+    const contrasena = document.getElementById("contrasena").value.trim(); //Toma el valor de la contraseña y elimina espacios
+
+    try { // Enviar datos al backend
+        const respuesta = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ correo, contrasena })
+        });
+        // Obtener respuesta del backend
+        const datos = await respuesta.json();
+        // Si no es exitoso, mostrar mensaje de error
+        if (!respuesta.ok) {
+            alert(datos.mensaje);
+            return;
+        }
+
+        // Redirigir según rol
+        if (datos.rol === 'Admin') {
+            window.location.href = '/html/admin_view.html';
+        } else if (datos.rol === 'Estudiante') {
+            window.location.href = '/html/dashboardAlumno_view.html';
+        } else if (datos.rol === 'Empresa') {
+            window.location.href = '/html/dashboardEmpresa_view.html';
+        }
+
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Error al conectar con el servidor");
+    }
 }
 
 document.querySelectorAll(".sideMenu a").forEach(link => {
@@ -34,6 +57,39 @@ document.querySelectorAll(".sideMenu a").forEach(link => {
     });
 });
 
-function returnToDashboard() {
-    window.location.href = "../admin_view.html";
+async function registrar() {
+    const correo = document.getElementById("correo-reg").value.trim();
+    const contrasena = document.getElementById("contrasena-reg").value.trim();
+    const rol = document.getElementById("rol").value;
+    try {
+        const respuesta = await fetch('/api/auth/registro',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ correo, contrasena, rol })
+        });
+        const datos = await respuesta.json();
+        if (!respuesta.ok) {
+            alert(datos.mensaje);
+            return;
+        }
+        alert("Usuario registrado exitosamente");
+        window.location.href = '/html/login_view.html';
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Error al conectar con el servidor");
+    }
+}
+
+async function cerrarSesion() {
+    try {
+        const respuesta = await fetch('/api/auth/logout', {
+            method: 'POST'
+        });
+        const datos = await respuesta.json();
+        if (respuesta.ok) {
+            window.location.href = '/html/login_view.html';
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
 }
