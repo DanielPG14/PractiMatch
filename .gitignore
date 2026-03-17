@@ -141,4 +141,7 @@ vite.config.ts.timestamp-*
 # Ignore all files in node_modules
 node_modules/
 
-#instalaciones: mysql12, bcrypt, dotenv, express-session
+#instalaciones: mysql12, bcrypt, dotenv, express-session.idea
+
+# IDE Settings
+.idea/
