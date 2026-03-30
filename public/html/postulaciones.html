@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mural de Vacantes</title>
+    <title>Postulaciones</title>
     <link rel="stylesheet" href="../css/estilos.css">
     <script src="../js/script.js" defer></script>
 </head>
 <body>
     <div class="Paneles">
         <div class="dashboard">
-            <h1>Mural de Vacantes</h1>
+            <h1>Postulaciones</h1>
         </div>
         <div class="cuerpo">
             <div class="sideMenu">
@@ -20,7 +20,7 @@
                 <hr>
                 <a href="#">Documentos iniciales</a>
                 <a href="#">Perfil</a>
-                <a href="#" class="activo">Vacantes</a>
+                <a href="#">Vacantes</a>
                 <hr>
                 <button onclick="cerrarSesion()">Cerrar sesión</button>
             </div>
@@ -31,32 +31,34 @@
                             <tr>
                                 <th>Empresa</th>
                                 <th>Tipo de proceso</th>
-                                <th>Descripción</th>
-                                <th>Fecha</th>
-                                <th>Acción</th>
+                                <th>Fecha de postulación</th>
+                                <th>Estatus</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Empresa Ejemplo 1</td>
-                                <td><span class="badge badge-nuevo">Servicio</span></td>
-                                <td>Desarrollo de software web</td>
+                                <td>Servicio</td>
                                 <td>2026-03-01</td>
-                                <td><button class="btn-subir" type="button">Postularme</button></td>
+                                <td><span class="badge badge-pendiente">En revisión</span></td>
                             </tr>
                             <tr>
                                 <td>Empresa Ejemplo 2</td>
-                                <td><span class="badge badge-pendiente">Práctica</span></td>
-                                <td>Soporte técnico y redes</td>
+                                <td>Práctica</td>
                                 <td>2026-03-05</td>
-                                <td><button class="btn-subir" type="button">Postularme</button></td>
+                                <td><span class="badge badge-aprobado">Aprobado</span></td>
                             </tr>
                             <tr>
                                 <td>Empresa Ejemplo 3</td>
-                                <td><span class="badge badge-aprobado">Integrativa</span></td>
-                                <td>Análisis de datos y reportes</td>
+                                <td>Integrativa</td>
                                 <td>2026-03-10</td>
-                                <td><button class="btn-subir" type="button">Postularme</button></td>
+                                <td><span class="badge badge-rechazado">Rechazado</span></td>
+                            </tr>
+                            <tr>
+                                <td>Empresa Ejemplo 4</td>
+                                <td>Servicio</td>
+                                <td>2026-03-15</td>
+                                <td><span class="badge badge-nuevo">En proceso</span></td>
                             </tr>
                         </tbody>
                     </table>

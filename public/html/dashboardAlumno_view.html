@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -24,37 +25,40 @@
                 <button onclick="cerrarSesion()">Cerrar sesión</button>
             </div>
             <div class="contenido">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Documento</th>
-                        <th>Estado</th>
-                        <th>Subir</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>INE</td>
-                        <td>Aprobado</td>
-                        <td><button type="button">Subir</button></td>
-                    </tr>
-                    <tr>
-                        <td>CURP</td>
-                        <td>Pendiente</td>
-                        <td><button type="button">Subir</button></td>
-                    </tr>
-                    <tr>
-                        <td>Comprobante de domicilio</td>
-                        <td>Pendiente</td>
-                        <td><button type="button">Subir</button></td>
-                    </tr>
-                    <tr>
-                        <td>Vigencia de seguro facultativo</td>
-                        <td>Pendiente</td>
-                        <td><button type="button">Subir</button></td>
-                    </tr>
-                </tbody>
-            </table>
+                <div class="tabla-contenedor">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Documento</th>
+                                <th>Estado</th>
+                                <th>Subir</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>INE</td>
+                                <td><span class="badge badge-aprobado">Aprobado</span></td>
+                                <td><button class="btn-subir" type="button">Subir</button></td>
+                            </tr>
+                            <tr>
+                                <td>CURP</td>
+                                <td><span class="badge badge-pendiente">Pendiente</span></td>
+                                <td><button class="btn-subir" type="button">Subir</button></td>
+                            </tr>
+                            <tr>
+                                <td>Comprobante de domicilio</td>
+                                <td><span class="badge badge-pendiente">Pendiente</span></td>
+                                <td><button class="btn-subir" type="button">Subir</button></td>
+                            </tr>
+                            <tr>
+                                <td>Vigencia de seguro facultativo</td>
+                                <td><span class="badge badge-pendiente">Pendiente</span></td>
+                                <td><button class="btn-subir" type="button">Subir</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </body>
