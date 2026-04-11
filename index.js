@@ -5,7 +5,7 @@ const port = 3000;
 const path = require('path');
 const session = require('express-session');
 
-//middleware 
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -18,6 +18,7 @@ app.use(session({
 
 // Rutas
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api', require('./routes/routes_dashboard')); // <-- rutas nuevas
 
 // Ruta al login
 app.get('/', (req, res) => {
