@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,7 +10,7 @@
 <body>
     <div class="Paneles">
         <div class="dashboard">
-            <h1>Panel del Administrador-Alumno1</h1>
+            <h1>Panel del Administrador — Alumno 1</h1>
         </div>
         <div class="cuerpo">
             <div class="sideMenu">
@@ -19,57 +20,65 @@
                 <hr>
                 <a href="#">Alumnos en empresas</a>
                 <hr>
-                <a href="login_view.html">Cerrar sesión</a>
+                <button onclick="cerrarSesion()">Cerrar sesión</button>
             </div>
             <div class="contenido">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Documento</th>
-                        <th>Estado</th>
-                        <th>Aprobación</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Registro</td>
-                        <td>Aprovado</td>
-                        <td>
-                            <button type="button">Aceptar</button><button type="button">Rechazar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><a href="">Carta compromiso</a></td>
-                        <td>Pendiente</td>
-                        <td>
-                            <button type="button">Aceptar</button><button type="button">Rechazar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><a href="">Carta presentación</a></td>
-                        <td>Pendiente</td>
-                        <td>
-                            <button type="button">Aceptar</button><button type="button">Rechazar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><a href="">Evaluación de unidad receptora</a></td>
-                        <td>Pendiente</td>
-                        <td>
-                            <button type="button">Aceptar</button><button type="button">Rechazar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><a href="">Carta de termino</a></td>
-                        <td>Pendiente</td>
-                        <td>
-                            <button type="button">Aceptar</button><button type="button">Rechazar</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <br>
-            <button type="button" onclick="returnToDashboard()">Regresar</button>
+                <div class="tabla-contenedor">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Documento</th>
+                                <th>Estado</th>
+                                <th>Aprobación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Registro</td>
+                                <td><span class="badge badge-aprobado">Aprobado</span></td>
+                                <td>
+                                    <button class="btn-aceptar" type="button">Aceptar</button>
+                                    <button class="btn-rechazar" type="button">Rechazar</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><a href="">Carta compromiso</a></td>
+                                <td><span class="badge badge-pendiente">Pendiente</span></td>
+                                <td>
+                                    <button class="btn-aceptar" type="button">Aceptar</button>
+                                    <button class="btn-rechazar" type="button">Rechazar</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><a href="">Carta presentación</a></td>
+                                <td><span class="badge badge-pendiente">Pendiente</span></td>
+                                <td>
+                                    <button class="btn-aceptar" type="button">Aceptar</button>
+                                    <button class="btn-rechazar" type="button">Rechazar</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><a href="">Evaluación de unidad receptora</a></td>
+                                <td><span class="badge badge-pendiente">Pendiente</span></td>
+                                <td>
+                                    <button class="btn-aceptar" type="button">Aceptar</button>
+                                    <button class="btn-rechazar" type="button">Rechazar</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><a href="">Carta de término</a></td>
+                                <td><span class="badge badge-pendiente">Pendiente</span></td>
+                                <td>
+                                    <button class="btn-aceptar" type="button">Aceptar</button>
+                                    <button class="btn-rechazar" type="button">Rechazar</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+                <button class="btn-subir" type="button" onclick="returnToDashboard()">← Regresar</button>
+            </div>
         </div>
     </div>
 </body>

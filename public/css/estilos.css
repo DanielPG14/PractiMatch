@@ -1,65 +1,128 @@
-/* Estilos para la ventana LOGIN */
-#fondo{
+/* ================================================
+   ESTILOS GENERALES
+   ================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --azul-oscuro:    #0a2463;
+    --azul-medio:     #1e5fba;
+    --azul-claro:     #00b4d8;
+    --azul-bg:        #e8f1ff;
+    --azul-hover:     #d1e3ff;
+    --gris-texto:     #475569;
+    --gris-borde:     #e2e8f0;
+    --gris-claro:     #f8fafc;
+    --blanco:         #ffffff;
+    --verde:          #16a34a;
+    --verde-bg:       #dcfce7;
+    --amarillo:       #b45309;
+    --amarillo-bg:    #fef9c3;
+    --rojo:           #dc2626;
+    --rojo-bg:        #fee2e2;
+    --azul-badge:     #1e5fba;
+    --azul-badge-bg:  #dbeafe;
+    --sombra-sm:      0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+    --sombra-md:      0 4px 16px rgba(10, 36, 99, 0.10), 0 1px 4px rgba(10,36,99,0.06);
+    --sombra-lg:      0 8px 32px rgba(10, 36, 99, 0.13), 0 2px 8px rgba(10,36,99,0.07);
+    --radio:          10px;
+    --radio-sm:       6px;
+    --fuente:         'DM Sans', sans-serif;
+    --fuente-mono:    'DM Mono', monospace;
+}
+
+body {
+    font-family: var(--fuente);
+    color: var(--gris-texto);
+    background: var(--azul-bg);
+}
+
+/* ================================================
+   LOGIN
+   ================================================ */
+
+#fondo {
     background: linear-gradient(135deg, #0a2463 0%, #1e5fba 45%, #00b4d8 100%);
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     min-height: 100vh;
     border: 0;
 }
-#fondo.active{
+
+#fondo.active {
     display: flex;
 }
-.ventanaM{
-    background: rgba(255, 255, 255, 0.9);
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 400px;
-    max-width: 90%;
+
+.ventanaM {
+    background: var(--blanco);
+    padding: 36px 32px;
+    border-radius: 16px;
+    box-shadow: var(--sombra-lg);
+    width: 420px;
+    max-width: 92%;
     min-height: 300px;
 }
-.titulos{
-    font-family: 'Arial', sans-serif;
-    color: #042a70;
+
+.titulos {
+    font-family: var(--fuente);
+    color: var(--azul-oscuro);
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
+
+.titulos h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Tabs */
 .tabs {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .tabs-contenedor {
     display: flex;
-    background: #e8f1ff;
-    border-radius: 8px;
+    background: var(--azul-bg);
+    border-radius: var(--radio-sm);
     padding: 4px;
     gap: 2px;
 }
 
 .tab {
     background: transparent;
-    color: #1e5fba;
+    color: var(--azul-medio);
     border: none;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 14px;
+    font-family: var(--fuente);
     padding: 10px 28px;
-    border-radius: 6px;
+    border-radius: var(--radio-sm);
     font-weight: 600;
     transition: all 0.2s;
 }
 
 .tab.activo {
-    background: #1e5fba;
-    color: white;
-    box-shadow: 0 2px 6px rgba(30, 95, 186, 0.3);
+    background: var(--azul-medio);
+    color: var(--blanco);
+    box-shadow: 0 2px 8px rgba(30, 95, 186, 0.25);
 }
 
 .tab:hover:not(.activo) {
-    background: rgba(30, 95, 186, 0.1);
+    background: var(--azul-hover);
 }
 
-form{
+/* Formulario */
+form {
     display: flex;
     flex-direction: column;
 }
@@ -68,116 +131,237 @@ form{
     display: flex;
     flex-direction: column;
     gap: 6px;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 
 .campo label {
     font-size: 13px;
     font-weight: 600;
-    color: #475569;
+    color: #334155;
+    letter-spacing: 0.01em;
 }
 
-.campo input, 
+.campo input,
 .campo select {
     padding: 10px 14px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
+    border: 1.5px solid var(--gris-borde);
+    border-radius: var(--radio-sm);
     font-size: 14px;
+    font-family: var(--fuente);
     outline: none;
-    transition: border 0.2s;
+    transition: border 0.2s, box-shadow 0.2s;
+    background: var(--gris-claro);
+    color: #1e293b;
 }
 
-.campo input:focus, 
+.campo input:focus,
 .campo select:focus {
-    border-color: #1e5fba;
+    border-color: var(--azul-medio);
+    box-shadow: 0 0 0 3px rgba(30, 95, 186, 0.12);
+    background: var(--blanco);
 }
 
-/* Estilos para ventana dashboard */
+/* ================================================
+   BOTONES GENERALES
+   ================================================ */
 
-.Paneles{
-    display: flex;
-    flex-direction: column;
-    background: #e8f1ff;
-    min-height: 100vh;
-}
-
-/* Estilos para el menú lateral */
-
-.sideMenu {
-    display: flex;
-    flex-direction: column;
-    width: 240px;
-    min-height: 100vh;
-    background: #ffffff;
-    border-right: 1px solid #e2e8f0;
-    padding: 20px 12px;
-    gap: 2px;
-}
-
-.sideMenu a {
-    text-decoration: none;
-    color: #475569;
+button {
+    font-family: var(--fuente);
     font-size: 14px;
-    font-weight: 500;
-    padding: 10px 14px;
-    border-radius: 8px;
-    transition: all 0.2s;
-}
-
-.sideMenu a:hover {
-    background: #e8f1ff;
-    color: #1e5fba;
-}
-
-.sideMenu a.activo {
-    background: #1e5fba;
-    color: white;
-}
-
-.sideMenu hr {
+    font-weight: 600;
+    cursor: pointer;
     border: none;
-    border-top: 1px solid #e2e8f0;
-    margin: 8px 0;
+    border-radius: var(--radio-sm);
+    padding: 10px 20px;
+    transition: all 0.18s;
+}
+
+/* Botón principal (submit, iniciar sesión, registrarse) */
+form > button,
+form button[type="button"]:not(.btn-subir) {
+    background: var(--azul-medio);
+    color: var(--blanco);
+    padding: 11px;
+    border-radius: var(--radio-sm);
+    width: 100%;
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+    box-shadow: 0 2px 8px rgba(30, 95, 186, 0.2);
+}
+
+form > button:hover,
+form button[type="button"]:not(.btn-subir):hover {
+    background: var(--azul-oscuro);
+    box-shadow: 0 4px 14px rgba(30, 95, 186, 0.3);
+    transform: translateY(-1px);
+}
+
+/* ================================================
+   DASHBOARD — LAYOUT
+   ================================================ */
+
+.Paneles {
+    display: flex;
+    flex-direction: column;
+    background: var(--azul-bg);
+    min-height: 100vh;
+}
+
+/* Header / navbar superior */
+.dashboard {
+    background: var(--blanco);
+    border-bottom: 1px solid var(--gris-borde);
+    padding: 0 28px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    box-shadow: var(--sombra-sm);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.dashboard h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--azul-oscuro);
+    letter-spacing: -0.3px;
+    position: relative;
+    padding-left: 14px;
+}
+
+.dashboard h1::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(180deg, var(--azul-medio), var(--azul-claro));
+    border-radius: 4px;
+}
+
+.cuerpo {
+    display: flex;
+    flex: 1;
 }
 
 .contenido {
     flex: 1;
-    padding: 20px;
-    min-width: 300px;
-}
-.cuerpo{
-    display: flex;
-    flex: 1;
-    gap: 20px;
+    padding: 28px;
+    min-width: 0;
 }
 
-/* Estilos para tablas */
+/* ================================================
+   MENÚ LATERAL
+   ================================================ */
+
+.sideMenu {
+    display: flex;
+    flex-direction: column;
+    width: 230px;
+    min-height: calc(100vh - 60px);
+    background: var(--blanco);
+    border-right: 1px solid var(--gris-borde);
+    padding: 20px 12px;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.sideMenu a {
+    text-decoration: none;
+    color: var(--gris-texto);
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 9px 14px;
+    border-radius: var(--radio-sm);
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+}
+
+.sideMenu a:hover {
+    background: var(--azul-hover);
+    color: var(--azul-medio);
+    padding-left: 18px;
+}
+
+.sideMenu a.activo {
+    background: var(--azul-medio);
+    color: var(--blanco);
+    font-weight: 600;
+}
+
+.sideMenu hr {
+    border: none;
+    border-top: 1px solid var(--gris-borde);
+    margin: 10px 0;
+}
+
+/* Botón cerrar sesión en sideMenu */
+.sideMenu button {
+    background: transparent;
+    color: var(--rojo);
+    border: 1.5px solid var(--rojo);
+    padding: 9px 14px;
+    border-radius: var(--radio-sm);
+    font-size: 13.5px;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 8px;
+    text-align: left;
+    transition: all 0.18s;
+}
+
+.sideMenu button:hover {
+    background: var(--rojo-bg);
+}
+
+/* ================================================
+   TABLAS
+   ================================================ */
+
+.tabla-contenedor {
+    background: var(--blanco);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-md);
+    overflow: hidden;
+    border: 1px solid var(--gris-borde);
+}
 
 table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
+    background: var(--blanco);
 }
 
 thead {
-    background: #1e5fba;
-    color: white;
+    background: linear-gradient(90deg, var(--azul-oscuro) 0%, var(--azul-medio) 100%);
+    color: var(--blanco);
 }
 
 th {
-    padding: 12px 16px;
+    padding: 14px 18px;
     text-align: left;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.92);
 }
 
 td {
-    padding: 12px 16px;
+    padding: 13px 18px;
     font-size: 14px;
-    color: #475569;
-    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+    border-bottom: 1px solid var(--gris-borde);
+    vertical-align: middle;
+}
+
+/* Filas alternas */
+tbody tr:nth-child(even) {
+    background: var(--gris-claro);
 }
 
 tbody tr:last-child td {
@@ -185,5 +369,122 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-    background: #e8f1ff;
+    background: var(--azul-hover);
+    transition: background 0.15s;
+}
+
+/* Links dentro de tabla (CV) */
+td a {
+    color: var(--azul-medio);
+    font-weight: 600;
+    text-decoration: none;
+    font-family: var(--fuente-mono);
+    font-size: 13px;
+    padding: 3px 8px;
+    background: var(--azul-badge-bg);
+    border-radius: 4px;
+    transition: all 0.15s;
+}
+
+td a:hover {
+    background: var(--azul-medio);
+    color: var(--blanco);
+}
+
+/* ================================================
+   BADGES DE ESTADO
+   ================================================ */
+
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.badge-aprobado {
+    background: var(--verde-bg);
+    color: var(--verde);
+}
+
+.badge-pendiente {
+    background: var(--amarillo-bg);
+    color: var(--amarillo);
+}
+
+.badge-rechazado {
+    background: var(--rojo-bg);
+    color: var(--rojo);
+}
+
+.badge-nuevo {
+    background: var(--azul-badge-bg);
+    color: var(--azul-badge);
+}
+
+.badge-sin-actualizacion {
+    background: #f1f5f9;
+    color: #94a3b8;
+}
+
+/* ================================================
+   BOTONES EN TABLA
+   ================================================ */
+
+.btn-aceptar {
+    background: var(--verde-bg);
+    color: var(--verde);
+    border: 1.5px solid #bbf7d0;
+    padding: 6px 14px;
+    border-radius: var(--radio-sm);
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 6px;
+    transition: all 0.18s;
+}
+
+.btn-aceptar:hover {
+    background: var(--verde);
+    color: var(--blanco);
+    border-color: var(--verde);
+    box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
+}
+
+.btn-rechazar {
+    background: var(--rojo-bg);
+    color: var(--rojo);
+    border: 1.5px solid #fecaca;
+    padding: 6px 14px;
+    border-radius: var(--radio-sm);
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.18s;
+}
+
+.btn-rechazar:hover {
+    background: var(--rojo);
+    color: var(--blanco);
+    border-color: var(--rojo);
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+}
+
+.btn-subir {
+    background: var(--azul-badge-bg);
+    color: var(--azul-medio);
+    border: 1.5px solid #bfdbfe;
+    padding: 6px 14px;
+    border-radius: var(--radio-sm);
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.18s;
+}
+
+.btn-subir:hover {
+    background: var(--azul-medio);
+    color: var(--blanco);
+    border-color: var(--azul-medio);
+    box-shadow: 0 2px 8px rgba(30, 95, 186, 0.25);
 }
