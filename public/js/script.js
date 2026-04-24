@@ -93,3 +93,38 @@ async function cerrarSesion() {
         console.error("Error:", error);
     }
 }
+
+async function cargarPostulaciones() {
+    const tabla = document.getElementById('cuerpo-tabla');
+    if (!tabla) return; // Si no estamos en la página de la tabla, no hacemos nada
+
+    try {
+        const response = await fetch('/api/postulaciones/listar');
+        const data = await response.json();
+
+        tabla.innerHTML = ""; // Limpiamos los datos estáticos
+
+        data.forEach(p => {
+            const row = document.createElement('tr');
+
+            // Lógica para que los colores de los badges sigan funcionando
+            let claseBadge = "badge-pendiente";
+            if (p.estatus === 'Aprobado') claseBadge = "badge-aprobado";
+            if (p.estatus === 'Rechazado') claseBadge = "badge-rechazado";
+            if (p.estatus === 'En proceso') claseBadge = "badge-nuevo";
+
+            row.innerHTML = `
+                <td>Empresa #${p.id_vacante}</td>
+                <td>Postulación ID: ${p.id_postulacion}</td>
+                <td>${new Date(p.fecha_postulacion).toLocaleDateString()}</td>
+                <td><span class="badge ${claseBadge}">${p.estatus}</span></td>
+            `;
+            tabla.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error al cargar datos con Ajax:', error);
+    }
+}
+
+// Se ejecuta en cuanto el HTML esté listo
+document.addEventListener('DOMContentLoaded', cargarPostulaciones);

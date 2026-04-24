@@ -18,6 +18,7 @@ app.use(session({
 
 // Rutas
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/postulaciones', require('./routes/postulaciones'));
 
 // Ruta al login
 app.get('/', (req, res) => {
