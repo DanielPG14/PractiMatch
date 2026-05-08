@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { obtenerPostulaciones } = require('../controllers/postulacionesController');
+const { getAll } = require('../controllers/postulacionesController');
 
-// Definimos el endpoint para el Ajax
-router.get('/listar', obtenerPostulaciones);
+// Endpoint para el AJAX que carga las postulaciones
+router.get('/listar', getAll);
 
 module.exports = router;
