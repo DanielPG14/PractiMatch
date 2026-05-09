@@ -92,8 +92,11 @@ INSERT INTO `usuarios` (`id_usuario`, `correo`, `password`, `rol`) VALUES
 CREATE TABLE `vacantes` (
   `id_vacante` int(11) NOT NULL,
   `id_empresa` int(11) DEFAULT NULL,
-  `tipo_proceso` enum('Servicio','Práctica','Integrativa') NOT NULL,
+  `titulo` varchar(150) NOT NULL,
+  `tipo_proceso` enum('Servicio','Práctica','Integrativa') DEFAULT 'Servicio',
   `descripcion` text NOT NULL,
+  `requisitos` text DEFAULT NULL,
+  `estado` enum('Pendiente','Aprobado','Rechazado') DEFAULT 'Pendiente',
   `fecha_creacion` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

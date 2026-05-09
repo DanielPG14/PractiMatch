@@ -43,6 +43,214 @@ body {
     background: var(--azul-bg);
 }
 
+#content-area {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.panel-section {
+    background: var(--blanco);
+    border: 1px solid var(--gris-borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-md);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+}
+
+.panel-section h2 {
+    font-size: 22px;
+    margin-bottom: 0;
+    color: var(--azul-oscuro);
+    font-family: var(--fuente);
+    font-weight: 700;
+    letter-spacing: -0.4px;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-section textarea {
+    resize: vertical;
+    min-height: 130px;
+    line-height: 1.75;
+}
+
+.form-message {
+    margin-top: 14px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* ================================================
+   MODAL PARA PERFIL DE EMPRESA
+   ================================================ */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 36, 99, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--blanco);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-lg);
+    padding: 32px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    border: 1px solid var(--gris-borde);
+}
+
+.modal-content h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--azul-oscuro);
+    margin-bottom: 20px;
+    font-family: var(--fuente);
+    letter-spacing: -0.4px;
+}
+
+.modal-content hr {
+    border: none;
+    border-top: 1px solid var(--gris-borde);
+    margin: 20px 0;
+}
+
+.modal-content .form-group {
+    margin-bottom: 20px;
+}
+
+.modal-content label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gris-texto);
+    margin-bottom: 8px;
+    font-family: var(--fuente);
+}
+
+.modal-content input,
+.modal-content select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--gris-borde);
+    border-radius: var(--radio-sm);
+    font-size: 14px;
+    font-family: var(--fuente);
+    background: var(--gris-claro);
+    color: #1e293b;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
+    border-color: var(--azul-medio);
+    box-shadow: 0 0 0 3px rgba(30, 95, 186, 0.12);
+    background: var(--blanco);
+}
+
+.modal-content input:disabled {
+    background: #f8fafc;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.modal-content .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-pendiente {
+    background: var(--amarillo-bg);
+    color: var(--amarillo);
+}
+
+.badge-aprobado {
+    background: var(--verde-bg);
+    color: var(--verde);
+}
+
+.badge-rechazado {
+    background: var(--rojo-bg);
+    color: var(--rojo);
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.btn-secundario {
+    background: var(--gris-claro);
+    color: var(--gris-texto);
+    border: 1.5px solid var(--gris-borde);
+    padding: 10px 20px;
+    border-radius: var(--radio-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+}
+
+.btn-secundario:hover {
+    background: var(--gris-borde);
+}
+
+.btn-primario {
+    background: var(--azul-medio);
+    color: var(--blanco);
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radio-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(30, 95, 186, 0.2);
+    transition: all 0.18s;
+}
+
+.btn-primario:hover {
+    background: var(--azul-oscuro);
+    box-shadow: 0 4px 14px rgba(30, 95, 186, 0.3);
+    transform: translateY(-1px);
+}
+
+.close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 24px;
+    color: var(--gris-texto);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: var(--rojo);
+}
+
+
 /* ================================================
    LOGIN
    ================================================ */
@@ -272,9 +480,10 @@ form button[type="button"]:not(.btn-subir):hover {
 .sideMenu a {
     text-decoration: none;
     color: var(--gris-texto);
-    font-size: 13.5px;
-    font-weight: 500;
-    padding: 9px 14px;
+    font-family: var(--fuente);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 16px;
     border-radius: var(--radio-sm);
     transition: all 0.18s;
     display: flex;
@@ -487,4 +696,32 @@ td a:hover {
     color: var(--blanco);
     border-color: var(--azul-medio);
     box-shadow: 0 2px 8px rgba(30, 95, 186, 0.25);
+}
+
+/*Bloque para el pop up de empresa*/
+
+   .modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 400px;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px; right: 15px;
+    font-size: 24px;
+    cursor: pointer;
 }

@@ -1,66 +1,65 @@
 const db = require('../config/database');
 
 // GET ALL
-exports.getAll = (table) => (req, res) => {
-    db.query(`SELECT * FROM ${table}`, (err, results) => {
-        if (err) return res.status(500).json({ success: false, error: err });
-
+exports.getAll = (table) => async (req, res) => {
+    try {
+        // En promesas usamos destructuración [rows]
+        const [results] = await db.query(`SELECT * FROM ${table}`);
         res.json({ success: true, data: results });
-    });
+    } catch (err) {
+        console.error(`Error en getAll (${table}):`, err);
+        res.status(500).json({ success: false, error: err.message });
+    }
 };
 
 // GET BY ID
-exports.getById = (table, idField) => (req, res) => {
-    db.query(
-        `SELECT * FROM ${table} WHERE ${idField} = ?`,
-        [req.params.id],
-        (err, results) => {
-            if (err) return res.status(500).json({ success: false });
-
-            res.json({ success: true, data: results[0] });
-        }
-    );
+exports.getById = (table, idField) => async (req, res) => {
+    try {
+        const [results] = await db.query(`SELECT * FROM ${table} WHERE ${idField} = ?`, [req.params.id]);
+        res.json({ success: true, data: results[0] });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
 };
 
 // CREATE
-exports.create = (table, fields) => (req, res) => {
-    const values = fields.map(f => req.body[f]);
-
-    db.query(
-        `INSERT INTO ${table} (${fields.join(',')}) VALUES (${fields.map(() => '?').join(',')})`,
-        values,
-        (err) => {
-            if (err) return res.status(500).json({ success: false, error: err });
-
-            res.json({ success: true, message: "Creado" });
-        }
-    );
+exports.create = (table, fields) => async (req, res) => {
+    try {
+        const values = fields.map(f => req.body[f]);
+        const placeholders = fields.map(() => '?').join(',');
+        
+        await db.query(
+            `INSERT INTO ${table} (${fields.join(',')}) VALUES (${placeholders})`,
+            values
+        );
+        res.json({ success: true, message: "Creado exitosamente" });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
 };
 
 // UPDATE
-exports.update = (table, idField, fields) => (req, res) => {
-    const values = fields.map(f => req.body[f]);
-
-    db.query(
-        `UPDATE ${table} SET ${fields.map(f => `${f}=?`).join(',')} WHERE ${idField}=?`,
-        [...values, req.params.id],
-        (err) => {
-            if (err) return res.status(500).json({ success: false });
-
-            res.json({ success: true, message: "Actualizado" });
-        }
-    );
+exports.update = (table, idField, fields) => async (req, res) => {
+    try {
+        const values = fields.map(f => req.body[f]);
+        const setClause = fields.map(f => `${f}=?`).join(',');
+        
+        await db.query(
+            `UPDATE ${table} SET ${setClause} WHERE ${idField}=?`,
+            [...values, req.params.id]
+        );
+        res.json({ success: true, message: "Actualizado exitosamente" });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
 };
 
 // DELETE
-exports.remove = (table, idField) => (req, res) => {
-    db.query(
-        `DELETE FROM ${table} WHERE ${idField}=?`,
-        [req.params.id],
-        (err) => {
-            if (err) return res.status(500).json({ success: false });
-
-            res.json({ success: true, message: "Eliminado" });
-        }
-    );
+exports.remove = (table, idField) => async (req, res) => {
+    try {
+        await db.query(`DELETE FROM ${table} WHERE ${idField}=?`, [req.params.id]);
+        res.json({ success: true, message: "Eliminado exitosamente" });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
 };

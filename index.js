@@ -18,8 +18,10 @@ app.use(session({
 
 // Rutas
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/postulaciones', require('./routes/postulaciones'));
+app.use('/api/postulaciones', require('./routes/postulacioneRoutes'));
+app.use('/api/vacantes', require('./routes/vacantesRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/empresas', require('./routes/empresasRoutes'));
 
 // Ruta al login
 app.get('/', (req, res) => {

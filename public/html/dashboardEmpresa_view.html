@@ -14,72 +14,51 @@
         </div>
         <div class="cuerpo">
             <div class="sideMenu">
-                <a href="#">Requisitos</a>
-                <a href="postulaciones.html">Solicitudes</a>
-                <a href="#">Becarios</a>
+                <a href="#" data-section="requisitos">Publicar</a>
+                <a href="#" data-section="solicitudes">Solicitudes</a>
+                <a href="#" data-section="becarios">Becarios</a>
                 <hr>
-                <a href="#">Perfil de la empresa</a>
+                <a href="#" onclick="abrirModalPerfil()">
+                    <i class="fas fa-user"></i> Perfil
+                </a>
                 <a href="#">Mural de vacantes</a>
                 <hr>
                 <button onclick="cerrarSesion()">Cerrar sesión</button>
             </div>
             <div class="contenido">
-                <div class="tabla-contenedor">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>CV</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaPostulaciones">
-                            <tr>
-                                <td>Alumno 1</td>
-                                <td><a href="">cv_alumno1.pdf</a></td>
-                                <td>
-                                    <button class="btn-aceptar" type="button">Aceptar</button>
-                                    <button class="btn-rechazar" type="button">Rechazar</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Alumno 2</td>
-                                <td><a href="">cv_alumno2.pdf</a></td>
-                                <td>
-                                    <button class="btn-aceptar" type="button">Aceptar</button>
-                                    <button class="btn-rechazar" type="button">Rechazar</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Alumno 3</td>
-                                <td><a href="">cv_alumno3.pdf</a></td>
-                                <td>
-                                    <button class="btn-aceptar" type="button">Aceptar</button>
-                                    <button class="btn-rechazar" type="button">Rechazar</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Alumno 4</td>
-                                <td><a href="">cv_alumno4.pdf</a></td>
-                                <td>
-                                    <button class="btn-aceptar" type="button">Aceptar</button>
-                                    <button class="btn-rechazar" type="button">Rechazar</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Alumno 5</td>
-                                <td><a href="">cv_alumno5.pdf</a></td>
-                                <td>
-                                    <button class="btn-aceptar" type="button">Aceptar</button>
-                                    <button class="btn-rechazar" type="button">Rechazar</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <div id="content-area"></div>
             </div>
         </div>
     </div>
-    <script src="../js/empresas.js"></script>
 </body>
-</html>
+
+// Modal para editar perfil de empresa
+
+<div id="modal-perfil" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="cerrarModalPerfil()">&times;</span>
+        <h2>Perfil de Empresa</h2>
+        <hr>
+        <form id="form-perfil-empresa">
+            <div class="form-group">
+                <label>Nombre de la Empresa</label>
+                <input type="text" id="perfil-nombre" name="nombre_empresa" disabled required>
+            </div>
+            
+            <div class="form-group">
+                <label>RFC</label>
+                <input type="text" id="perfil-rfc" name="rfc" disabled required>
+            </div>
+
+            <div class="form-group">
+                <label>Estado de Registro</label>
+                <span id="perfil-estado" class="badge"></span>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="btn-editar-activar" onclick="habilitarEdicion()" class="btn-secundario">Editar Datos</button>
+                <button type="submit" id="btn-guardar-perfil" class="btn-primario" style="display:none;">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
