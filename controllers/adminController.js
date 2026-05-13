@@ -31,6 +31,7 @@ exports.getDashboard = async (req, res) => {
 };
 exports.getAllUsers = async (req, res) => {
     try {
+        // Agregamos 'nombre' a la consulta
         const [results] = await db.query("SELECT id_usuario, correo, rol FROM usuarios");
         res.json({ success: true, data: results });
     } catch (err) {

@@ -207,6 +207,16 @@ ALTER TABLE `vacantes`
   ADD CONSTRAINT `fk_vacante_empresa` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`);
 COMMIT;
 
+CREATE TABLE documentos (
+                            id_documento INT AUTO_INCREMENT PRIMARY KEY,
+                            id_estudiante INT NOT NULL,
+                            nombre_archivo VARCHAR(255) NOT NULL,
+                            ruta_archivo TEXT NOT NULL,
+                            estado ENUM('Pendiente', 'Aprobado', 'Rechazado') DEFAULT 'Pendiente',
+                            comentarios TEXT,
+                            fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            FOREIGN KEY (id_estudiante) REFERENCES estudiantes(id_estudiante) ON DELETE CASCADE
+);
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

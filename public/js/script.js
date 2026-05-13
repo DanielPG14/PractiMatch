@@ -215,15 +215,26 @@ document.querySelectorAll('.sideMenu a').forEach(link => {
         }
     });
 });
+function cargarSeccionAdmin(section) {
+    // 1. Actualizar clases activas
+    document.querySelectorAll('.sideMenu a').forEach(a => {
+        a.classList.toggle('activo', a.dataset.section === section);
+    });
+
+    // 2. Definir las vistas (Estaban fuera de la función)
     const vistas = {
         'dashboard': renderAdminDashboard,
-        'usuarios': renderAdminUsuarios,
+        'alumnos': renderAdminUsuarios, // Cambiado de 'usuarios' a 'alumnos' para coincidir con el HTML
         'empresas-pendientes': renderAdminEmpresasPendientes,
         'solicitudes': renderAdminSolicitudes
     };
 
-    if (vistas[section]) vistas[section]();
-
+    if (vistas[section]) {
+        vistas[section]();
+    } else {
+        console.warn("Sección no encontrada:", section);
+    }
+}
 function renderAdminDashboard() {
     document.getElementById('content-area').innerHTML = `
     <div class="panel-section">
@@ -231,8 +242,6 @@ function renderAdminDashboard() {
       <p>Bienvenido, Admin. Aquí puedes gestionar la integridad del sistema.</p>
     </div>`;
 }
-
-// Reemplaza tus funciones de renderizado por estas:
 
 function renderAdminUsuarios() {
     document.getElementById('content-area').innerHTML = `
@@ -281,9 +290,17 @@ function renderAdminSolicitudes() {
       </table>
     </div>`;
 
-    // Llamamos al endpoint que usa tu función getDashboard
-    // Nota: asegúrate que en index.js la ruta sea /api/admin/dashboard
-    cargarDatosTabla('/api/admin/dashboard', 'tabla-admin-dashboard');
+    // Definimos cómo se ve la fila para los datos del Admin
+    const rowAdminDashboard = (p) => `
+        <tr>
+            <td>${p.correo}</td>
+            <td>${p.vacante_titulo}</td>
+            <td><span class="badge badge-revision">${p.estatus}</span></td>
+        </tr>
+    `;
+
+    // USAMOS LA GENÉRICA
+    cargarDatosTablaGenerica('/api/admin/dashboard', 'tabla-admin-dashboard', rowAdminDashboard);
 }
 
 function renderAdminEmpresasPendientes() {
@@ -292,16 +309,22 @@ function renderAdminEmpresasPendientes() {
       <h2>Empresas esperando aprobación</h2>
       <table>
         <thead>
-          <tr><th>ID</th><th>Empresa</th><th>RFC</th><th>Estado</th><th>Acción</th></tr>
+          <tr><th>ID</th><th>Empresa</th><th>Estado</th><th>Acción</th></tr>
         </thead>
         <tbody id="tabla-empresas-pendientes"></tbody>
       </table>
     </div>`;
 
-    // Cargamos los datos (necesitarás crear este endpoint en el backend)
-    cargarDatosTabla('/api/admin/empresas/pendientes', 'tabla-empresas-pendientes');
-}
+    const rowEmpresa = (e) => `
+        <tr>
+            <td>${e.id_empresa}</td>
+            <td>${e.nombre_empresa}</td>
+            <td><span class="badge badge-pendiente">${e.estado}</span></td>
+            <td><button class="btn-primario">Validar</button></td>
+        </tr>`;
 
+    cargarDatosTablaGenerica('/api/admin/empresas/pendientes', 'tabla-empresas-pendientes', rowEmpresa);
+}
 // 6. PERFIL DE EMPRESAS (POP UP)
 
 async function abrirModalPerfil() {
