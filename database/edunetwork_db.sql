@@ -217,6 +217,14 @@ CREATE TABLE documentos (
                             fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             FOREIGN KEY (id_estudiante) REFERENCES estudiantes(id_estudiante) ON DELETE CASCADE
 );
+
+INSERT INTO usuarios (id_usuario, correo, password, rol) VALUES
+    (052,'admin@eladmin.com','117', 'Admin');
+
+UPDATE usuarios
+SET password = '$2b$10$4qGmoJ0LkXNxPMiFSZ1GmO0J78x1m0nFrvJ87c7FGdZCQdimaMQ4u' -- La contraseña sigue siendo 117 pero lo pase por el bycriptxd
+WHERE correo = 'admin@eladmin.com';
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

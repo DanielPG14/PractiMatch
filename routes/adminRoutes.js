@@ -6,5 +6,6 @@ router.get('/dashboard', controller.getDashboard);
 
 router.get('/usuarios', controller.getAllUsers);
 router.get('/empresas/pendientes', controller.getPendingCompanies);
+router.put('/empresas/estado', controller.updateEmpresaEstado);
 
 module.exports = router;

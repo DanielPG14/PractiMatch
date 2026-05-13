@@ -47,3 +47,13 @@ exports.getPendingCompanies = async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 };
+
+exports.updateEmpresaEstado = async (req, res) => {
+    const { id_empresa, estado } = req.body;
+    try {
+        await db.query("UPDATE empresas SET estado = ? WHERE id_empresa = ?", [estado, id_empresa]);
+        res.json({ success: true, message: "Empresa actualizada" });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};

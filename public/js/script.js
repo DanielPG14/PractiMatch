@@ -1,51 +1,55 @@
 // 1. GESTIÓN DE SESIÓN Y AUTENTICACIÓN
 
 async function iniciarSesion() {
-  const correo = document.getElementById("correo").value.trim();
-  const contrasena = document.getElementById("contrasena").value.trim();
+    const correo = document.getElementById("correo").value.trim();
+    const contrasena = document.getElementById("contrasena").value.trim();
 
-  try {
-    const respuesta = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ correo, contrasena })
-    });
-    const datos = await respuesta.json();
+    try {
+        const respuesta = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({correo, contrasena})
+        });
+        const datos = await respuesta.json();
 
-    if (!respuesta.ok) return alert(datos.mensaje);
+        if (!respuesta.ok) return alert(datos.mensaje);
 
-    // Redirección por roles
-    const rutas = { 'Admin': 'admin_view.html', 'Estudiante': 'dashboardAlumno_view.html', 'Empresa': 'dashboardEmpresa_view.html' };
-    if (rutas[datos.rol]) window.location.href = `/html/${rutas[datos.rol]}`;
+        // Redirección por roles
+        const rutas = {
+            'Admin': 'admin_view.html',
+            'Estudiante': 'dashboardAlumno_view.html',
+            'Empresa': 'dashboardEmpresa_view.html'
+        };
+        if (rutas[datos.rol]) window.location.href = `/html/${rutas[datos.rol]}`;
 
-  } catch (error) {
-    console.error("Error login:", error);
-    alert("Error al conectar con el servidor");
-  }
+    } catch (error) {
+        console.error("Error login:", error);
+        alert("Error al conectar con el servidor");
+    }
 }
 
 async function cerrarSesion() {
-  try {
-    const respuesta = await fetch('/api/auth/logout', { method: 'POST' });
-    if (respuesta.ok) window.location.href = '/html/login_view.html';
-  } catch (error) {
-    console.error("Error logout:", error);
-  }
+    try {
+        const respuesta = await fetch('/api/auth/logout', {method: 'POST'});
+        if (respuesta.ok) window.location.href = '/html/login_view.html';
+    } catch (error) {
+        console.error("Error logout:", error);
+    }
 }
 
 // 2. UTILIDADES DE RENDERIZADO (FRONTEND)
 
 function crearFilaPostulacion(p) {
-  const clases = {
-    'Aprobado': 'badge-aprobado',
-    'Rechazado': 'badge-rechazado',
-    'En proceso': 'badge-nuevo',
-    'En revisión': 'badge-revision',
-    'Finalizado': 'badge-finalizado'
-  };
-  const claseBadge = clases[p.estatus] || 'badge-pendiente';
+    const clases = {
+        'Aprobado': 'badge-aprobado',
+        'Rechazado': 'badge-rechazado',
+        'En proceso': 'badge-nuevo',
+        'En revisión': 'badge-revision',
+        'Finalizado': 'badge-finalizado'
+    };
+    const claseBadge = clases[p.estatus] || 'badge-pendiente';
 
-  return `
+    return `
     <tr>
       <td>#${p.id_postulacion}</td>
       <td>${p.matricula || 'N/A'}</td>
@@ -58,28 +62,28 @@ function crearFilaPostulacion(p) {
 }
 
 async function cargarDatosTabla(endpoint, tableBodyId, filterFn = null, msg = 'Sin datos') {
-  const tabla = document.getElementById(tableBodyId);
-  if (!tabla) return;
+    const tabla = document.getElementById(tableBodyId);
+    if (!tabla) return;
 
-  try {
-    const res = await fetch(endpoint);
-    const json = await res.json();
-    let lista = json.data || [];
-    
-    if (filterFn) lista = lista.filter(filterFn);
+    try {
+        const res = await fetch(endpoint);
+        const json = await res.json();
+        let lista = json.data || [];
 
-    tabla.innerHTML = lista.length > 0 
-      ? lista.map(crearFilaPostulacion).join('') 
-      : `<tr><td colspan="6" style="text-align:center;">${msg}</td></tr>`;
-  } catch (error) {
-    tabla.innerHTML = "<tr><td colspan='6' style='color:red;'>Error de conexión</td></tr>";
-  }
+        if (filterFn) lista = lista.filter(filterFn);
+
+        tabla.innerHTML = lista.length > 0
+            ? lista.map(crearFilaPostulacion).join('')
+            : `<tr><td colspan="6" style="text-align:center;">${msg}</td></tr>`;
+    } catch (error) {
+        tabla.innerHTML = "<tr><td colspan='6' style='color:red;'>Error de conexión</td></tr>";
+    }
 }
 
 // 3. SECCIONES DINÁMICAS (DASHBOARD EMPRESA)
 
 function renderRequisitosSection() {
-  document.getElementById('content-area').innerHTML = `
+    document.getElementById('content-area').innerHTML = `
     <div class="panel-section">
       <h2>Publicar Nueva Vacante</h2>
       <form id="vacante-form" class="form-section">
@@ -98,11 +102,11 @@ function renderRequisitosSection() {
       <div id="vacante-message"></div>
     </div>
   `;
-  document.getElementById('vacante-form').addEventListener('submit', handleVacanteSubmit);
+    document.getElementById('vacante-form').addEventListener('submit', handleVacanteSubmit);
 }
 
 function renderSolicitudesSection() {
-  document.getElementById('content-area').innerHTML = `
+    document.getElementById('content-area').innerHTML = `
     <div class="panel-section">
       <h2>Solicitudes Recibidas</h2>
       <table>
@@ -112,11 +116,11 @@ function renderSolicitudesSection() {
         <tbody id="tabla-solicitudes"></tbody>
       </table>
     </div>`;
-  cargarDatosTabla('/api/postulaciones', 'tabla-solicitudes', null, 'No hay solicitudes');
+    cargarDatosTabla('/api/postulaciones', 'tabla-solicitudes', null, 'No hay solicitudes');
 }
 
 function renderBecariosSection() {
-  document.getElementById('content-area').innerHTML = `
+    document.getElementById('content-area').innerHTML = `
     <div class="panel-section">
       <h2>Mis Becarios Activos</h2>
       <table>
@@ -126,77 +130,77 @@ function renderBecariosSection() {
         <tbody id="tabla-becarios"></tbody>
       </table>
     </div>`;
-  cargarDatosTabla('/api/postulaciones', 'tabla-becarios', b => b.estatus === 'Aprobado', 'No tienes becarios aprobados');
+    cargarDatosTabla('/api/postulaciones', 'tabla-becarios', b => b.estatus === 'Aprobado', 'No tienes becarios aprobados');
 }
 
 // 4. LÓGICA DE ENVÍO (BACKEND CONNECT)
 
 async function handleVacanteSubmit(e) {
-  e.preventDefault();
-  const msg = document.getElementById('vacante-message');
+    e.preventDefault();
+    const msg = document.getElementById('vacante-message');
 
-  // Construimos el objeto SIN el campo 'titulo'
-  const payload = {
-    tipo_proceso: document.getElementById('tipo-proceso').value,
-    descripcion: document.getElementById('vacante-descripcion').value.trim()
-  };
+    // Construimos el objeto SIN el campo 'titulo'
+    const payload = {
+        tipo_proceso: document.getElementById('tipo-proceso').value,
+        descripcion: document.getElementById('vacante-descripcion').value.trim()
+    };
 
-  try {
-    const res = await fetch('/api/vacantes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    try {
+        const res = await fetch('/api/vacantes', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
 
-    const datos = await res.json();
+        const datos = await res.json();
 
-    if (res.ok) {
-      msg.innerHTML = "<p style='color:green;'>✅ Vacante guardada correctamente</p>";
-      e.target.reset();
-      setTimeout(() => cargarSeccionEmpresa('solicitudes'), 2000);
-    } else {
-      // Aquí verás el error detallado si algo falla
-      msg.innerHTML = `<p style='color:red;'>❌ ${datos.error || 'Error al guardar'}</p>`;
+        if (res.ok) {
+            msg.innerHTML = "<p style='color:green;'>✅ Vacante guardada correctamente</p>";
+            e.target.reset();
+            setTimeout(() => cargarSeccionEmpresa('solicitudes'), 2000);
+        } else {
+            // Aquí verás el error detallado si algo falla
+            msg.innerHTML = `<p style='color:red;'>❌ ${datos.error || 'Error al guardar'}</p>`;
+        }
+    } catch (error) {
+        console.error("Error en la petición:", error);
     }
-  } catch (error) {
-    console.error("Error en la petición:", error);
-  }
 }
 
 // 5. CONTROLADOR DE NAVEGACIÓN Y EVENTOS
 
 function cargarSeccionEmpresa(section) {
-  // Actualizar clases activas en el menú
-  document.querySelectorAll('.sideMenu a').forEach(a => {
-    a.classList.toggle('activo', a.dataset.section === section);
-  });
+    // Actualizar clases activas en el menú
+    document.querySelectorAll('.sideMenu a').forEach(a => {
+        a.classList.toggle('activo', a.dataset.section === section);
+    });
 
-  // Cargar contenido
-  const vistas = {
-    'requisitos': renderRequisitosSection,
-    'solicitudes': renderSolicitudesSection,
-    'becarios': renderBecariosSection
-  };
-  
-  if (vistas[section]) vistas[section]();
+    // Cargar contenido
+    const vistas = {
+        'requisitos': renderRequisitosSection,
+        'solicitudes': renderSolicitudesSection,
+        'becarios': renderBecariosSection
+    };
+
+    if (vistas[section]) vistas[section]();
 }
 
 // Listeners de clics en el menú
 document.querySelectorAll('.sideMenu a').forEach(link => {
-  link.addEventListener('click', (e) => {
-    const sec = e.target.closest('a').dataset.section;
-    if (sec) {
-      e.preventDefault();
-      cargarSeccionEmpresa(sec);
-    }
-  });
+    link.addEventListener('click', (e) => {
+        const sec = e.target.closest('a').dataset.section;
+        if (sec) {
+            e.preventDefault();
+            cargarSeccionEmpresa(sec);
+        }
+    });
 });
 
 // Carga inicial
 document.addEventListener('DOMContentLoaded', () => {
-  if (document.getElementById('content-area')) {
-    cargarSeccionEmpresa('requisitos');
-  }
+    if (document.getElementById('content-area')) {
+        cargarSeccionEmpresa('requisitos');
+    }
 });
 
 // CONTROLADOR DE NAVEGACIÓN PARA ADMIN
@@ -215,6 +219,7 @@ document.querySelectorAll('.sideMenu a').forEach(link => {
         }
     });
 });
+
 function cargarSeccionAdmin(section) {
     // 1. Actualizar clases activas
     document.querySelectorAll('.sideMenu a').forEach(a => {
@@ -235,6 +240,7 @@ function cargarSeccionAdmin(section) {
         console.warn("Sección no encontrada:", section);
     }
 }
+
 function renderAdminDashboard() {
     document.getElementById('content-area').innerHTML = `
     <div class="panel-section">
@@ -320,11 +326,35 @@ function renderAdminEmpresasPendientes() {
             <td>${e.id_empresa}</td>
             <td>${e.nombre_empresa}</td>
             <td><span class="badge badge-pendiente">${e.estado}</span></td>
-            <td><button class="btn-primario">Validar</button></td>
+            <td>
+                <button class="btn-primario" onclick="cambiarEstadoEmpresa(${e.id_empresa}, 'APROBADO')">Aprobar</button>
+                <button class="btn-peligro" onclick="cambiarEstadoEmpresa(${e.id_empresa}, 'RECHAZADO')">X</button>
+            </td>
         </tr>`;
 
     cargarDatosTablaGenerica('/api/admin/empresas/pendientes', 'tabla-empresas-pendientes', rowEmpresa);
 }
+
+async function cambiarEstadoEmpresa(id, nuevoEstado) {
+    if(!confirm(`¿Seguro que quieres cambiar el estado a ${nuevoEstado}?`)) return;
+
+    try {
+        const res = await fetch(`/api/admin/empresas/estado`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_empresa: id, estado: nuevoEstado })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            alert("Estado actualizado");
+            renderAdminEmpresasPendientes(); // Recargamos la tabla para que desaparezca de "pendientes"
+        }
+    } catch (e) {
+        console.error("Error al actualizar:", e);
+    }
+}
+
 // 6. PERFIL DE EMPRESAS (POP UP)
 
 async function abrirModalPerfil() {
@@ -336,7 +366,7 @@ async function abrirModalPerfil() {
             const emp = resJson.data;
             document.getElementById('perfil-nombre').value = emp.nombre_empresa;
             document.getElementById('perfil-rfc').value = emp.rfc || '';
-            
+
             const estadoBadge = document.getElementById('perfil-estado');
             estadoBadge.textContent = emp.estado;
             estadoBadge.className = `badge badge-${emp.estado.toLowerCase()}`;
@@ -367,6 +397,7 @@ function deshabilitarEdicion() {
 function cerrarModalPerfil() {
     document.getElementById('modal-perfil').style.display = 'none';
 }
+
 /*
 // Guardar cambios
 document.getElementById('form-perfil-empresa').addEventListener('submit', async (e) => {
@@ -406,7 +437,7 @@ if (formPerfil) { // Solo se ejecuta si el formulario existe (Vista Empresa)
         try {
             const res = await fetch('/api/empresas/perfil', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload)
             });
 
