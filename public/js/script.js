@@ -199,6 +199,109 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// CONTROLADOR DE NAVEGACIÓN PARA ADMIN
+// CORRECCIÓN DE NAVEGACIÓN GLOBAL
+document.querySelectorAll('.sideMenu a').forEach(link => {
+    link.addEventListener('click', (e) => {
+        const sec = e.target.closest('a').dataset.section;
+        if (sec) {
+            e.preventDefault();
+            // Detectamos en qué página estamos para saber qué controlador usar
+            if (window.location.pathname.includes('admin_view')) {
+                cargarSeccionAdmin(sec);
+            } else {
+                cargarSeccionEmpresa(sec);
+            }
+        }
+    });
+});
+    const vistas = {
+        'dashboard': renderAdminDashboard,
+        'usuarios': renderAdminUsuarios,
+        'empresas-pendientes': renderAdminEmpresasPendientes,
+        'solicitudes': renderAdminSolicitudes
+    };
+
+    if (vistas[section]) vistas[section]();
+
+function renderAdminDashboard() {
+    document.getElementById('content-area').innerHTML = `
+    <div class="panel-section">
+      <h2>Panel de Control Global</h2>
+      <p>Bienvenido, Admin. Aquí puedes gestionar la integridad del sistema.</p>
+    </div>`;
+}
+
+// Reemplaza tus funciones de renderizado por estas:
+
+function renderAdminUsuarios() {
+    document.getElementById('content-area').innerHTML = `
+    <div class="panel-section">
+      <h2>Gestión de Usuarios</h2>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Rol</th></tr>
+        </thead>
+        <tbody id="tabla-admin-usuarios"></tbody>
+      </table>
+    </div>`;
+
+    // Función personalizada para filas de usuarios
+    const rowUser = (u) => `<tr><td>${u.id_usuario}</td><td>${u.nombre}</td><td>${u.correo}</td><td>${u.rol}</td></tr>`;
+    cargarDatosTablaGenerica('/api/admin/usuarios', 'tabla-admin-usuarios', rowUser);
+}
+
+// Nueva función de carga genérica para evitar errores
+async function cargarDatosTablaGenerica(endpoint, tableBodyId, rowFn, msg = 'Sin datos') {
+    const tabla = document.getElementById(tableBodyId);
+    if (!tabla) return;
+    try {
+        const res = await fetch(endpoint);
+        const json = await res.json();
+        const lista = json.data || [];
+        tabla.innerHTML = lista.length > 0 ? lista.map(rowFn).join('') : `<tr><td colspan="5">${msg}</td></tr>`;
+    } catch (e) {
+        tabla.innerHTML = "<tr><td colspan='5' style='color:red;'>Error al cargar datos</td></tr>";
+    }
+}
+
+function renderAdminSolicitudes() {
+    document.getElementById('content-area').innerHTML = `
+    <div class="panel-section">
+      <h2>Solicitudes Globales (Dashboard)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Vacante</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-admin-dashboard"></tbody>
+      </table>
+    </div>`;
+
+    // Llamamos al endpoint que usa tu función getDashboard
+    // Nota: asegúrate que en index.js la ruta sea /api/admin/dashboard
+    cargarDatosTabla('/api/admin/dashboard', 'tabla-admin-dashboard');
+}
+
+function renderAdminEmpresasPendientes() {
+    document.getElementById('content-area').innerHTML = `
+    <div class="panel-section">
+      <h2>Empresas esperando aprobación</h2>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Empresa</th><th>RFC</th><th>Estado</th><th>Acción</th></tr>
+        </thead>
+        <tbody id="tabla-empresas-pendientes"></tbody>
+      </table>
+    </div>`;
+
+    // Cargamos los datos (necesitarás crear este endpoint en el backend)
+    cargarDatosTabla('/api/admin/empresas/pendientes', 'tabla-empresas-pendientes');
+}
+
 // 6. PERFIL DE EMPRESAS (POP UP)
 
 async function abrirModalPerfil() {
@@ -241,7 +344,7 @@ function deshabilitarEdicion() {
 function cerrarModalPerfil() {
     document.getElementById('modal-perfil').style.display = 'none';
 }
-
+/*
 // Guardar cambios
 document.getElementById('form-perfil-empresa').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -264,5 +367,45 @@ document.getElementById('form-perfil-empresa').addEventListener('submit', async 
         }
     } catch (error) {
         alert("Error al actualizar");
+    }
+});*/
+// Guardar cambios - PROTEGIDO PARA SPA
+const formPerfil = document.getElementById('form-perfil-empresa');
+
+if (formPerfil) { // Solo se ejecuta si el formulario existe (Vista Empresa)
+    formPerfil.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            nombre_empresa: document.getElementById('perfil-nombre').value,
+            rfc: document.getElementById('perfil-rfc').value
+        };
+
+        try {
+            const res = await fetch('/api/empresas/perfil', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                alert("Perfil actualizado correctamente");
+                deshabilitarEdicion();
+                cerrarModalPerfil();
+            }
+        } catch (error) {
+            alert("Error al actualizar");
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const contentArea = document.getElementById('content-area');
+    if (contentArea) {
+        // Si la URL contiene 'admin', cargamos el dashboard de admin
+        if (window.location.pathname.includes('admin_view')) {
+            cargarSeccionAdmin('dashboard');
+        } else {
+            cargarSeccionEmpresa('requisitos');
+        }
     }
 });

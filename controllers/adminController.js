@@ -29,3 +29,20 @@ exports.getDashboard = async (req, res) => {
         });
     }
 };
+exports.getAllUsers = async (req, res) => {
+    try {
+        const [results] = await db.query("SELECT id_usuario, correo, rol FROM usuarios");
+        res.json({ success: true, data: results });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+exports.getPendingCompanies = async (req, res) => {
+    try {
+        const [results] = await db.query("SELECT * FROM empresas WHERE estado = 'Pendiente'");
+        res.json({ success: true, data: results });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
