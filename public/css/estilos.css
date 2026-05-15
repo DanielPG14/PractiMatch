@@ -725,3 +725,33 @@ td a:hover {
     font-size: 24px;
     cursor: pointer;
 }
+.section-subtitle {
+    font-size: 14px;
+    color: var(--gris-texto);
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+/* Para que los textareas del formulario sigan el estilo de tus inputs */
+.form-section textarea {
+    padding: 12px 14px;
+    border: 1.5px solid var(--gris-borde);
+    border-radius: var(--radio-sm);
+    font-size: 14px;
+    font-family: var(--fuente);
+    background: var(--gris-claro);
+    outline: none;
+    transition: all 0.2s;
+}
+
+.form-section textarea:focus {
+    border-color: var(--azul-medio);
+    background: var(--blanco);
+    box-shadow: 0 0 0 3px rgba(30, 95, 186, 0.12);
+}

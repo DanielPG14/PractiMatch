@@ -65,11 +65,11 @@ async function cargarDatosTabla(endpoint, tableBodyId, filterFn = null, msg = 'S
     const res = await fetch(endpoint);
     const json = await res.json();
     let lista = json.data || [];
-    
+
     if (filterFn) lista = lista.filter(filterFn);
 
-    tabla.innerHTML = lista.length > 0 
-      ? lista.map(crearFilaPostulacion).join('') 
+    tabla.innerHTML = lista.length > 0
+      ? lista.map(crearFilaPostulacion).join('')
       : `<tr><td colspan="6" style="text-align:center;">${msg}</td></tr>`;
   } catch (error) {
     tabla.innerHTML = "<tr><td colspan='6' style='color:red;'>Error de conexión</td></tr>";
@@ -81,23 +81,47 @@ async function cargarDatosTabla(endpoint, tableBodyId, filterFn = null, msg = 'S
 function renderRequisitosSection() {
   document.getElementById('content-area').innerHTML = `
     <div class="panel-section">
-      <h2>Publicar Nueva Vacante</h2>
+      <div class="section-header">
+        <h2><i class="fas fa-briefcase"></i> Publicar Nueva Vacante</h2>
+        <p class="section-subtitle">Completa la información para que los estudiantes puedan postularse.</p>
+      </div>
+
       <form id="vacante-form" class="form-section">
-        <label>Tipo de Proceso</label>
-        <select id="tipo-proceso" required>
+        <div class="campo">
+          <label for="vacante-titulo">Título de la Vacante</label>
+          <input type="text" id="vacante-titulo" placeholder="Ej. Desarrollador Web Junior" required>
+        </div>
+
+        <div class="campo">
+          <label for="tipo-proceso">Tipo de Proceso</label>
+          <select id="tipo-proceso" required>
+            <option value="" disabled selected>Selecciona una opción...</option>
             <option value="Servicio">Servicio Social</option>
             <option value="Practica">Práctica Profesional</option>
             <option value="Integrativa">Integrativa Profesional</option>
-        </select>
+          </select>
+        </div>
 
-        <label>Descripción detallada</label>
-        <textarea id="vacante-descripcion" rows="5" required placeholder="Describe las tareas..."></textarea>
+        <div class="campo">
+          <label for="vacante-descripcion">Descripción de Actividades</label>
+          <textarea id="vacante-descripcion" placeholder="¿Qué tareas realizará el estudiante?" required></textarea>
+        </div>
 
-        <button type="submit" class="btn-primario">Crear Vacante</button>
+        <div class="campo">
+          <label for="vacante-requisitos">Requisitos y Habilidades</label>
+          <textarea id="vacante-requisitos" placeholder="Ej. Conocimientos en Java, SQL, Inglés básico..." required></textarea>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" class="btn-primario">
+            <i class="fas fa-paper-plane"></i> Enviar Vacante a Revisión
+          </button>
+        </div>
       </form>
       <div id="vacante-message"></div>
     </div>
   `;
+  // Re-vinculamos el evento
   document.getElementById('vacante-form').addEventListener('submit', handleVacanteSubmit);
 }
 
@@ -132,35 +156,49 @@ function renderBecariosSection() {
 // 4. LÓGICA DE ENVÍO (BACKEND CONNECT)
 
 async function handleVacanteSubmit(e) {
-  e.preventDefault();
-  const msg = document.getElementById('vacante-message');
+    e.preventDefault();
+    
+    // Mostramos un loader o cambiamos el estado del botón
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+    btn.disabled = true;
 
-  // Construimos el objeto SIN el campo 'titulo'
-  const payload = {
-    tipo_proceso: document.getElementById('tipo-proceso').value,
-    descripcion: document.getElementById('vacante-descripcion').value.trim()
-  };
+    const payload = {
+        titulo: document.getElementById('vacante-titulo').value,
+        tipo_proceso: document.getElementById('tipo-proceso').value,
+        descripcion: document.getElementById('vacante-descripcion').value,
+        requisitos: document.getElementById('vacante-requisitos').value
+    };
 
-  try {
-    const res = await fetch('/api/vacantes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    try {
+        const response = await fetch('/api/vacantes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
 
-    const datos = await res.json();
+        const result = await response.json();
 
-    if (res.ok) {
-      msg.innerHTML = "<p style='color:green;'>✅ Vacante guardada correctamente</p>";
-      e.target.reset();
-      setTimeout(() => cargarSeccionEmpresa('solicitudes'), 2000);
-    } else {
-      // Aquí verás el error detallado si algo falla
-      msg.innerHTML = `<p style='color:red;'>❌ ${datos.error || 'Error al guardar'}</p>`;
+        if (result.success) {
+            // Usamos una alerta estilizada o un mensaje en el DOM
+            document.getElementById('vacante-message').innerHTML = `
+                <div class="badge badge-aprobado" style="width:100%; text-align:center; margin-top:15px; padding:10px;">
+                    ¡Éxito! La vacante ha sido publicada.
+                </div>`;
+            e.target.reset(); // Limpiar formulario
+        } else {
+            throw new Error(result.mensaje);
+        }
+    } catch (error) {
+        document.getElementById('vacante-message').innerHTML = `
+            <div class="badge badge-rechazado" style="width:100%; text-align:center; margin-top:15px; padding:10px;">
+                Error: ${error.message}
+            </div>`;
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
     }
-  } catch (error) {
-    console.error("Error en la petición:", error);
-  }
 }
 
 // 5. CONTROLADOR DE NAVEGACIÓN Y EVENTOS
@@ -177,7 +215,7 @@ function cargarSeccionEmpresa(section) {
     'solicitudes': renderSolicitudesSection,
     'becarios': renderBecariosSection
   };
-  
+
   if (vistas[section]) vistas[section]();
 }
 
@@ -202,67 +240,67 @@ document.addEventListener('DOMContentLoaded', () => {
 // 6. PERFIL DE EMPRESAS (POP UP)
 
 async function abrirModalPerfil() {
-    try {
-        const res = await fetch('/api/empresas/perfil');
-        const resJson = await res.json();
+  try {
+    const res = await fetch('/api/empresas/perfil');
+    const resJson = await res.json();
 
-        if (resJson.success) {
-            const emp = resJson.data;
-            document.getElementById('perfil-nombre').value = emp.nombre_empresa;
-            document.getElementById('perfil-rfc').value = emp.rfc || '';
-            
-            const estadoBadge = document.getElementById('perfil-estado');
-            estadoBadge.textContent = emp.estado;
-            estadoBadge.className = `badge badge-${emp.estado.toLowerCase()}`;
+    if (resJson.success) {
+      const emp = resJson.data;
+      document.getElementById('perfil-nombre').value = emp.nombre_empresa;
+      document.getElementById('perfil-rfc').value = emp.rfc || '';
 
-            // Resetear estado del modal
-            deshabilitarEdicion();
-            document.getElementById('modal-perfil').style.display = 'flex';
-        }
-    } catch (error) {
-        console.error("Error:", error);
+      const estadoBadge = document.getElementById('perfil-estado');
+      estadoBadge.textContent = emp.estado;
+      estadoBadge.className = `badge badge-${emp.estado.toLowerCase()}`;
+
+      // Resetear estado del modal
+      deshabilitarEdicion();
+      document.getElementById('modal-perfil').style.display = 'flex';
     }
+  } catch (error) {
+    console.error("Error:", error);
+  }
 }
 
 function habilitarEdicion() {
-    document.getElementById('perfil-nombre').disabled = false;
-    document.getElementById('perfil-rfc').disabled = false;
-    document.getElementById('btn-editar-activar').style.display = 'none';
-    document.getElementById('btn-guardar-perfil').style.display = 'inline-block';
+  document.getElementById('perfil-nombre').disabled = false;
+  document.getElementById('perfil-rfc').disabled = false;
+  document.getElementById('btn-editar-activar').style.display = 'none';
+  document.getElementById('btn-guardar-perfil').style.display = 'inline-block';
 }
 
 function deshabilitarEdicion() {
-    document.getElementById('perfil-nombre').disabled = true;
-    document.getElementById('perfil-rfc').disabled = true;
-    document.getElementById('btn-editar-activar').style.display = 'inline-block';
-    document.getElementById('btn-guardar-perfil').style.display = 'none';
+  document.getElementById('perfil-nombre').disabled = true;
+  document.getElementById('perfil-rfc').disabled = true;
+  document.getElementById('btn-editar-activar').style.display = 'inline-block';
+  document.getElementById('btn-guardar-perfil').style.display = 'none';
 }
 
 function cerrarModalPerfil() {
-    document.getElementById('modal-perfil').style.display = 'none';
+  document.getElementById('modal-perfil').style.display = 'none';
 }
 
 // Guardar cambios
 document.getElementById('form-perfil-empresa').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const payload = {
-        nombre_empresa: document.getElementById('perfil-nombre').value,
-        rfc: document.getElementById('perfil-rfc').value
-    };
+  e.preventDefault();
+  const payload = {
+    nombre_empresa: document.getElementById('perfil-nombre').value,
+    rfc: document.getElementById('perfil-rfc').value
+  };
 
-    try {
-        const res = await fetch('/api/empresas/perfil', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+  try {
+    const res = await fetch('/api/empresas/perfil', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
 
-        if (res.ok) {
-            alert("Perfil actualizado correctamente");
-            deshabilitarEdicion();
-            cerrarModalPerfil();
-        }
-    } catch (error) {
-        alert("Error al actualizar");
+    if (res.ok) {
+      alert("Perfil actualizado correctamente");
+      deshabilitarEdicion();
+      cerrarModalPerfil();
     }
+  } catch (error) {
+    alert("Error al actualizar");
+  }
 });
