@@ -22,6 +22,7 @@ app.use('/api/postulaciones', require('./routes/postulacioneRoutes'));
 app.use('/api/vacantes', require('./routes/vacantesRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/empresas', require('./routes/empresasRoutes'));
+app.use('/api/estudiantes', require('./routes/estudiantesRoutes'));
 
 // Ruta al login
 app.get('/', (req, res) => {
