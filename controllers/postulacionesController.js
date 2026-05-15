@@ -1,3 +1,4 @@
+const generic = require('./genericController');
 const db = require('../config/database');
 
 exports.getAll = async (req, res) => {

@@ -1,3 +1,4 @@
+const generic = require('./genericController');
 const { obtenerUsuarios, crearUsuario } = require('../models/model_usuarios');
 const bcrypt = require('bcrypt');
 

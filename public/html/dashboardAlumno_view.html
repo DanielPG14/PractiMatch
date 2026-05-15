@@ -14,53 +14,56 @@
         </div>
         <div class="cuerpo">
             <div class="sideMenu">
-                <a href="#">Servicio</a>
-                <a href="#">Integrativa</a>
-                <a href="#">Prácticas</a>
+                <a href="#" data-section="servicio">Servicio Social</a>
+                <a href="#" data-section="integrativa">Integrativa Profesional</a>
+                <a href="#" data-section="practicas">Prácticas Profesionales</a>
                 <hr>
-                <a href="#">Documentos iniciales</a>
-                <a href="#">Perfil</a>
-                <a href="#">Vacantes</a>
+                <a href="#" data-section="documentos">Documentos Iniciales</a>
+                <a href="#" data-section="perfil">Perfil</a>
+                <a href="#" data-section="vacantes">Vacantes</a>
                 <hr>
                 <button onclick="cerrarSesion()">Cerrar sesión</button>
             </div>
             <div class="contenido">
-                <div class="tabla-contenedor">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Documento</th>
-                                <th>Estado</th>
-                                <th>Subir</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaDocumentos">
-                            <tr>
-                                <td>INE</td>
-                                <td><span class="badge badge-aprobado">Aprobado</span></td>
-                                <td><button class="btn-subir" type="button">Subir</button></td>
-                            </tr>
-                            <tr>
-                                <td>CURP</td>
-                                <td><span class="badge badge-pendiente">Pendiente</span></td>
-                                <td><button class="btn-subir" type="button">Subir</button></td>
-                            </tr>
-                            <tr>
-                                <td>Comprobante de domicilio</td>
-                                <td><span class="badge badge-pendiente">Pendiente</span></td>
-                                <td><button class="btn-subir" type="button">Subir</button></td>
-                            </tr>
-                            <tr>
-                                <td>Vigencia de seguro facultativo</td>
-                                <td><span class="badge badge-pendiente">Pendiente</span></td>
-                                <td><button class="btn-subir" type="button">Subir</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <div id="content-area"></div>
             </div>
         </div>
     </div>
-    <script src="../js/alumno.js"></script>
+
+    <!-- MODAL DE PERFIL DEL ALUMNO -->
+    <div id="modal-perfil-alumno" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn" onclick="cerrarModalPerfilAlumno()">&times;</span>
+            <h2>Mi Perfil</h2>
+            <hr>
+            <form id="form-perfil-alumno">
+                <div class="form-group">
+                    <label>ID Estudiante</label>
+                    <input type="text" id="perfil-id-estudiante" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Matrícula</label>
+                    <input type="text" id="perfil-matricula" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Carrera</label>
+                    <input type="text" id="perfil-carrera" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Correo</label>
+                    <input type="text" id="perfil-correo" disabled>
+                </div>
+                <div class="form-group">
+                    <label>RFC</label>
+                    <input type="text" id="perfil-rfc" disabled>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secundario" onclick="cerrarModalPerfilAlumno()">Cancelar</button>
+                    <button type="button" class="btn-primario" id="btn-editar-perfil-alumno" onclick="habilitarEdicionPerfilAlumno()">Editar</button>
+                    <button type="submit" class="btn-primario" id="btn-guardar-perfil-alumno" style="display: none;">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
