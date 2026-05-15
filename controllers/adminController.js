@@ -29,3 +29,31 @@ exports.getDashboard = async (req, res) => {
         });
     }
 };
+exports.getAllUsers = async (req, res) => {
+    try {
+        // Agregamos 'nombre' a la consulta
+        const [results] = await db.query("SELECT id_usuario, correo, rol FROM usuarios");
+        res.json({ success: true, data: results });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+exports.getPendingCompanies = async (req, res) => {
+    try {
+        const [results] = await db.query("SELECT * FROM empresas WHERE estado = 'Pendiente'");
+        res.json({ success: true, data: results });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+exports.updateEmpresaEstado = async (req, res) => {
+    const { id_empresa, estado } = req.body;
+    try {
+        await db.query("UPDATE empresas SET estado = ? WHERE id_empresa = ?", [estado, id_empresa]);
+        res.json({ success: true, message: "Empresa actualizada" });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
