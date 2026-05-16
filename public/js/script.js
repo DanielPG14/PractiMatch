@@ -37,6 +37,13 @@ async function cerrarSesion() {
     }
 }
 
+let procesoAlumnoSeleccionado = null;
+const PROCESOS_ALUMNO = {
+    servicio: 'Servicio',
+    practicas: 'Práctica',
+    integrativa: 'Integrativa'
+};
+
 // 2. UTILIDADES DE RENDERIZADO (FRONTEND)
 
 function crearFilaPostulacion(p) {
@@ -84,23 +91,37 @@ async function cargarDatosTabla(endpoint, tableBodyId, filterFn = null, msg = 'S
 
 function renderRequisitosSection() {
     document.getElementById('content-area').innerHTML = `
-    <div class="panel-section">
-      <h2>Publicar Nueva Vacante</h2>
+    <section class="panel-section">
+      <div>
+        <h2>Publicar Nueva Vacante</h2>
+        <p class="section-subtitle">Crea una vacante y conecta con estudiantes que buscan tu proceso.</p>
+      </div>
       <form id="vacante-form" class="form-section">
-        <label>Tipo de Proceso</label>
-        <select id="tipo-proceso" required>
+        <div class="form-group">
+          <label for="tipo-proceso">Tipo de Proceso</label>
+          <select id="tipo-proceso" required>
             <option value="Servicio">Servicio Social</option>
-            <option value="Practica">Práctica Profesional</option>
+            <option value="Práctica">Práctica Profesional</option>
             <option value="Integrativa">Integrativa Profesional</option>
-        </select>
+          </select>
+        </div>
 
-        <label>Descripción detallada</label>
-        <textarea id="vacante-descripcion" rows="5" required placeholder="Describe las tareas..."></textarea>
+        <div class="form-group">
+          <label for="vacante-descripcion">Descripción detallada</label>
+          <textarea id="vacante-descripcion" rows="5" required placeholder="Describe las responsabilidades de la vacante..."></textarea>
+        </div>
 
-        <button type="submit" class="btn-primario">Crear Vacante</button>
+        <div class="form-group">
+          <label for="vacante-requisitos">Requisitos (opcional)</label>
+          <textarea id="vacante-requisitos" rows="3" placeholder="Ej. Ingeniería, inglés, disponibilidad de 6 meses..."></textarea>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" class="btn-primario">Crear Vacante</button>
+          <div id="vacante-message"></div>
+        </div>
       </form>
-      <div id="vacante-message"></div>
-    </div>
+    </section>
   `;
     document.getElementById('vacante-form').addEventListener('submit', handleVacanteSubmit);
 }
@@ -139,10 +160,10 @@ async function handleVacanteSubmit(e) {
     e.preventDefault();
     const msg = document.getElementById('vacante-message');
 
-    // Construimos el objeto SIN el campo 'titulo'
     const payload = {
         tipo_proceso: document.getElementById('tipo-proceso').value,
-        descripcion: document.getElementById('vacante-descripcion').value.trim()
+        descripcion: document.getElementById('vacante-descripcion').value.trim(),
+        requisitos: document.getElementById('vacante-requisitos').value.trim()
     };
 
     try {
@@ -155,15 +176,15 @@ async function handleVacanteSubmit(e) {
         const datos = await res.json();
 
         if (res.ok) {
-            msg.innerHTML = "<p style='color:green;'>✅ Vacante guardada correctamente</p>";
+            msg.innerHTML = "<p class='text-sm text-green-600'>✅ Vacante guardada correctamente</p>";
             e.target.reset();
             setTimeout(() => cargarSeccionEmpresa('solicitudes'), 2000);
         } else {
-            // Aquí verás el error detallado si algo falla
-            msg.innerHTML = `<p style='color:red;'>❌ ${datos.error || 'Error al guardar'}</p>`;
+            msg.innerHTML = `<p class='text-sm text-red-600'>❌ ${datos.error || 'Error al guardar'}</p>`;
         }
     } catch (error) {
         console.error("Error en la petición:", error);
+        msg.innerHTML = "<p class='text-sm text-red-600'>❌ Error de conexión</p>";
     }
 }
 
@@ -354,41 +375,44 @@ async function cambiarEstadoEmpresa(id, nuevoEstado) {
 
 // 6. PERFIL DE EMPRESAS (POP UP)
 
-async function abrirModalPerfilAlumno() {
+async function cargarPerfilEmpresa() {
     try {
-        const res = await fetch('/api/estudiantes/perfil');
-        
-        // Si el servidor devuelve 404 o 500, no intentamos procesar el JSON
+        const res = await fetch('/api/empresas/perfil');
+
         if (!res.ok) {
             const errorData = await res.json();
-            alert(`⚠️ Error: ${errorData.mensaje || 'No se encontró el perfil'}`);
-            return; 
+            alert(`⚠️ Error: ${errorData.mensaje || 'No se encontró el perfil de empresa'}`);
+            return;
         }
 
         const resJson = await res.json();
-
         if (resJson.success && resJson.data) {
-            const est = resJson.data;
-            
-            // Llenado seguro de campos
-            document.getElementById('perfil-id-estudiante').value = est.id_estudiante || '';
-            document.getElementById('perfil-matricula').value = est.matricula || '';
-            document.getElementById('perfil-carrera').value = est.carrera || '';
-            document.getElementById('perfil-correo').value = est.correo || 'N/A'; // ¡Ya viene del JOIN!
-            document.getElementById('perfil-rfc').value = est.rfc || '';
+            const data = resJson.data;
 
-            deshabilitarEdicionPerfilAlumno();
-            document.getElementById('modal-perfil-alumno').style.display = 'flex';
+            document.getElementById('perfil-nombre').value = data.nombre_empresa || '';
+            document.getElementById('perfil-rfc').value = data.rfc || '';
+            document.getElementById('perfil-correo').value = data.correo || '';
+            document.getElementById('perfil-contacto').value = data.nombre_contacto || '';
+            document.getElementById('perfil-estado').textContent = data.estado || '';
+
+            deshabilitarEdicion();
+            document.getElementById('modal-perfil').style.display = 'flex';
         }
     } catch (error) {
-        console.error("Error crítico en el modal:", error);
+        console.error("Error crítico en el modal de empresa:", error);
         alert("No se pudo conectar con el servidor. Revisa la consola de Node.js");
     }
+}
+
+function abrirModalPerfil() {
+    cargarPerfilEmpresa();
 }
 
 function habilitarEdicion() {
     document.getElementById('perfil-nombre').disabled = false;
     document.getElementById('perfil-rfc').disabled = false;
+    document.getElementById('perfil-contacto').disabled = false;
+    document.getElementById('perfil-correo').disabled = false;
     document.getElementById('btn-editar-activar').style.display = 'none';
     document.getElementById('btn-guardar-perfil').style.display = 'inline-block';
 }
@@ -396,6 +420,8 @@ function habilitarEdicion() {
 function deshabilitarEdicion() {
     document.getElementById('perfil-nombre').disabled = true;
     document.getElementById('perfil-rfc').disabled = true;
+    document.getElementById('perfil-contacto').disabled = true;
+    document.getElementById('perfil-correo').disabled = true;
     document.getElementById('btn-editar-activar').style.display = 'inline-block';
     document.getElementById('btn-guardar-perfil').style.display = 'none';
 }
@@ -410,12 +436,34 @@ function cerrarModalPerfil() {
 
 // Documentos iniciales - Vista por defecto
 function renderDocumentosSection() {
-    const documentos = [
+    const proceso = procesoAlumnoSeleccionado;
+    let titulo = 'Documentos Iniciales';
+    let documentos = [
         { nombre: 'INE', estado: 'Aprobado' },
         { nombre: 'CURP', estado: 'Pendiente' },
         { nombre: 'Comprobante de domicilio', estado: 'Pendiente' },
         { nombre: 'Vigencia de seguro facultativo', estado: 'Pendiente' }
     ];
+    let mensajeExtra = 'Selecciona un proceso para filtrar vacantes y adaptar los documentos requeridos.';
+
+    if (proceso === 'Servicio') {
+        titulo = 'Documentos requeridos para Servicio Social';
+        documentos = [
+            { nombre: 'Carta Presentación', estado: 'Pendiente' },
+            { nombre: 'Carta Compromiso', estado: 'Pendiente' },
+            { nombre: 'Constancia de Término', estado: 'Pendiente' }
+        ];
+        mensajeExtra = 'Para Servicio Social se requieren los documentos indicados. Súbelos cuando tengas todo listo.';
+    } else if (proceso === 'Práctica' || proceso === 'Integrativa') {
+        titulo = `Documentos requeridos para ${proceso}`;
+        documentos = [
+            { nombre: 'Carta Presentación', estado: 'Pendiente' },
+            { nombre: 'Carta Compromiso', estado: 'Pendiente' },
+            { nombre: 'Valoración', estado: 'Pendiente' },
+            { nombre: 'Constancia de Término', estado: 'Pendiente' }
+        ];
+        mensajeExtra = `Para ${proceso} se requieren los documentos indicados. Súbelos cuando tengas todo listo.`;
+    }
 
     const filas = documentos.map(doc => {
         const claseBadge = doc.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente';
@@ -430,7 +478,8 @@ function renderDocumentosSection() {
 
     document.getElementById('content-area').innerHTML = `
         <div class="panel-section">
-            <h2>Documentos Iniciales</h2>
+            <h2>${titulo}</h2>
+            <p class="info-adicional">${mensajeExtra}</p>
             <div class="tabla-contenedor">
                 <table>
                     <thead>
@@ -451,9 +500,13 @@ function renderDocumentosSection() {
 
 // Vacantes disponibles
 function renderVacantesAlumnoSection() {
+    const titulo = procesoAlumnoSeleccionado ? `Vacantes de ${procesoAlumnoSeleccionado}` : 'Vacantes Disponibles';
+    const filtro = procesoAlumnoSeleccionado ? `<p class="info-adicional">Mostrando solo vacantes de ${procesoAlumnoSeleccionado}.</p>` : '';
+
     document.getElementById('content-area').innerHTML = `
         <div class="panel-section">
-            <h2>Vacantes Disponibles</h2>
+            <h2>${titulo}</h2>
+            ${filtro}
             <table>
                 <thead>
                     <tr>
@@ -475,18 +528,22 @@ async function cargarVacantesParaAlumno() {
     try {
         const res = await fetch('/api/vacantes');
         const json = await res.json();
-        const vacantes = json.data || [];
+        let vacantes = json.data || [];
+
+        if (procesoAlumnoSeleccionado) {
+            vacantes = vacantes.filter(v => v.tipo_proceso === procesoAlumnoSeleccionado);
+        }
 
         tabla.innerHTML = vacantes.length > 0 
             ? vacantes.map(v => `
                 <tr>
                     <td>${v.tipo_proceso}</td>
                     <td>${v.nombre_empresa || 'N/A'}</td>
-                    <td>${v.descripcion.substring(0, 50)}...</td>
+                    <td>${v.descripcion ? v.descripcion.substring(0, 50) : ''}...</td>
                     <td><button class="btn-primario" onclick="postularseAVacante(${v.id_vacante})">Postularse</button></td>
                 </tr>
             `).join('')
-            : `<tr><td colspan="4" style="text-align:center;">No hay vacantes disponibles</td></tr>`;
+            : `<tr><td colspan="4" style="text-align:center;">No hay vacantes disponibles${procesoAlumnoSeleccionado ? ' para el proceso seleccionado' : ''}</td></tr>`;
     } catch (error) {
         tabla.innerHTML = "<tr><td colspan='4' style='color:red;'>Error al cargar vacantes</td></tr>";
     }
@@ -494,36 +551,18 @@ async function cargarVacantesParaAlumno() {
 
 // Secciones próximamente
 function renderServicioSection() {
-    document.getElementById('content-area').innerHTML = `
-        <div class="panel-section">
-            <h2>Servicio Social</h2>
-            <p style="color: var(--gris-texto); font-size: 16px; text-align: center; padding: 40px 0;">
-                ⏳ Esta sección estará disponible próximamente
-            </p>
-        </div>
-    `;
+    procesoAlumnoSeleccionado = 'Servicio';
+    renderVacantesAlumnoSection();
 }
 
 function renderIntegrativaSection() {
-    document.getElementById('content-area').innerHTML = `
-        <div class="panel-section">
-            <h2>Integrativa Profesional</h2>
-            <p style="color: var(--gris-texto); font-size: 16px; text-align: center; padding: 40px 0;">
-                ⏳ Esta sección estará disponible próximamente
-            </p>
-        </div>
-    `;
+    procesoAlumnoSeleccionado = 'Integrativa';
+    renderVacantesAlumnoSection();
 }
 
 function renderPracticasSection() {
-    document.getElementById('content-area').innerHTML = `
-        <div class="panel-section">
-            <h2>Prácticas Profesionales</h2>
-            <p style="color: var(--gris-texto); font-size: 16px; text-align: center; padding: 40px 0;">
-                ⏳ Esta sección estará disponible próximamente
-            </p>
-        </div>
-    `;
+    procesoAlumnoSeleccionado = 'Práctica';
+    renderVacantesAlumnoSection();
 }
 
 function renderPerfilSection() {
@@ -532,7 +571,6 @@ function renderPerfilSection() {
 
 // Controlador de navegación del alumno
 function cargarSeccionAlumno(section) {
-    // Cargar contenido
     const vistas = {
         'documentos': renderDocumentosSection,
         'vacantes': renderVacantesAlumnoSection,
@@ -563,6 +601,7 @@ async function abrirModalPerfilAlumno() {
             document.getElementById('perfil-matricula').value = est.matricula || '';
             document.getElementById('perfil-carrera').value = est.carrera || '';
             document.getElementById('perfil-correo').value = est.correo || 'N/A';
+            document.getElementById('perfil-nombre').value = est.nombre || '';
             document.getElementById('perfil-rfc').value = est.rfc || '';
 
             deshabilitarEdicionPerfilAlumno();
@@ -580,12 +619,14 @@ async function abrirModalPerfilAlumno() {
 
 function habilitarEdicionPerfilAlumno() {
     document.getElementById('perfil-rfc').disabled = false;
+    document.getElementById('perfil-nombre').disabled = false;
     document.getElementById('btn-editar-perfil-alumno').style.display = 'none';
     document.getElementById('btn-guardar-perfil-alumno').style.display = 'inline-block';
 }
 
 function deshabilitarEdicionPerfilAlumno() {
     document.getElementById('perfil-rfc').disabled = true;
+    document.getElementById('perfil-nombre').disabled = true;
     document.getElementById('btn-editar-perfil-alumno').style.display = 'inline-block';
     document.getElementById('btn-guardar-perfil-alumno').style.display = 'none';
 }
@@ -604,7 +645,10 @@ async function postularseAVacante(idVacante) {
         const res = await fetch('/api/postulaciones', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_vacante: idVacante })
+            body: JSON.stringify({
+                id_vacante: idVacante,
+                tipo_proceso: procesoAlumnoSeleccionado || 'Servicio'
+            })
         });
 
         const data = await res.json();
@@ -653,7 +697,9 @@ if (formPerfil) { // Solo se ejecuta si el formulario existe (Vista Empresa)
         e.preventDefault();
         const payload = {
             nombre_empresa: document.getElementById('perfil-nombre').value,
-            rfc: document.getElementById('perfil-rfc').value
+            rfc: document.getElementById('perfil-rfc').value,
+            correo: document.getElementById('perfil-correo').value,
+            nombre: document.getElementById('perfil-contacto').value
         };
 
         try {
@@ -667,8 +713,12 @@ if (formPerfil) { // Solo se ejecuta si el formulario existe (Vista Empresa)
                 alert("Perfil actualizado correctamente");
                 deshabilitarEdicion();
                 cerrarModalPerfil();
+            } else {
+                const data = await res.json();
+                alert(`Error al actualizar: ${data.mensaje || data.error || 'Error desconocido'}`);
             }
         } catch (error) {
+            console.error('Error al actualizar perfil de empresa:', error);
             alert("Error al actualizar");
         }
     });

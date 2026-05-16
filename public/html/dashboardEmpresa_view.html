@@ -30,9 +30,8 @@
             </div>
         </div>
     </div>
-</body>
 
-// Modal para editar perfil de empresa
+<!-- Modal para editar perfil de empresa -->
 
 <div id="modal-perfil" class="modal-overlay" style="display:none;">
     <div class="modal-content">
@@ -40,19 +39,31 @@
         <h2>Perfil de Empresa</h2>
         <hr>
         <form id="form-perfil-empresa">
-            <div class="form-group">
-                <label>Nombre de la Empresa</label>
-                <input type="text" id="perfil-nombre" name="nombre_empresa" disabled required>
-            </div>
-            
-            <div class="form-group">
-                <label>RFC</label>
-                <input type="text" id="perfil-rfc" name="rfc" disabled required>
-            </div>
+            <div class="form-section">
+                <div class="form-group">
+                    <label>Nombre de la Empresa</label>
+                    <input type="text" id="perfil-nombre" name="nombre_empresa" disabled required />
+                </div>
 
-            <div class="form-group">
-                <label>Estado de Registro</label>
-                <span id="perfil-estado" class="badge"></span>
+                <div class="form-group">
+                    <label>RFC</label>
+                    <input type="text" id="perfil-rfc" name="rfc" disabled required />
+                </div>
+
+                <div class="form-group">
+                    <label>Correo de contacto</label>
+                    <input type="email" id="perfil-correo" name="correo" disabled required />
+                </div>
+
+                <div class="form-group">
+                    <label>Nombre del contacto</label>
+                    <input type="text" id="perfil-contacto" name="nombre" disabled required />
+                </div>
+
+                <div class="form-group">
+                    <label>Estado de Registro</label>
+                    <span id="perfil-estado" class="badge"></span>
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -62,3 +73,5 @@
         </form>
     </div>
 </div>
+</body>
+</html>

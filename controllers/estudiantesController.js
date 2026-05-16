@@ -7,9 +7,8 @@ const ID = 'id_estudiante';
 // Obtener perfil del estudiante autenticado
 exports.getPerfil = async (req, res) => {
     try {
-        // 1. Validar que la sesión exista antes de pedir el ID
-        if (!req.session || !req.session.usuario) {
-            console.log("Sesión no encontrada");
+        if (!req.session || !req.session.usuario || !req.session.usuario.id) {
+            console.log("Sesión no encontrada o inválida en getPerfil");
             return res.status(401).json({
                 success: false,
                 mensaje: "Sesión expirada. Por favor, vuelve a loguearte."
@@ -18,14 +17,14 @@ exports.getPerfil = async (req, res) => {
 
         const id_usuario_sesion = req.session.usuario.id;
 
-        // 2. Tu consulta con el JOIN (Asegúrate de que los nombres de tabla sean correctos)
         const query = `
             SELECT 
-                e.id_estudiante, 
-                e.matricula, 
-                e.carrera, 
-                e.rfc, 
-                u.correo
+                e.id_estudiante,
+                e.matricula,
+                e.carrera,
+                e.rfc,
+                u.correo,
+                u.nombre
             FROM estudiantes e
             INNER JOIN usuarios u ON e.id_usuario = u.id_usuario
             WHERE u.id_usuario = ?
@@ -44,23 +43,53 @@ exports.getPerfil = async (req, res) => {
     }
 };
 
-// Actualizar perfil del estudiante (solo RFC es editable)
 exports.updatePerfil = async (req, res) => {
+    let connection;
     try {
-        const id_usuario = req.session.usuario ? req.session.usuario.id : null;
-        const { rfc } = req.body;
+        const id_usuario = req.session && req.session.usuario ? req.session.usuario.id : null;
+        const { rfc, correo, nombre } = req.body;
 
         if (!id_usuario) {
             return res.status(401).json({ success: false, mensaje: "Sesión no válida" });
         }
 
-        const query = 'UPDATE estudiantes SET rfc = ? WHERE id_usuario = ?';
-        await db.query(query, [rfc, id_usuario]);
+        if (rfc === undefined && correo === undefined && nombre === undefined) {
+            return res.status(400).json({ success: false, mensaje: "No se proporcionó ningún campo para actualizar." });
+        }
 
+        connection = await db.getConnection();
+        await connection.beginTransaction();
+
+        if (rfc !== undefined) {
+            await connection.query('UPDATE estudiantes SET rfc = ? WHERE id_usuario = ?', [rfc, id_usuario]);
+        }
+
+        if (correo !== undefined || nombre !== undefined) {
+            const updates = [];
+            const params = [];
+            if (correo !== undefined) {
+                updates.push('correo = ?');
+                params.push(correo);
+            }
+            if (nombre !== undefined) {
+                updates.push('nombre = ?');
+                params.push(nombre);
+            }
+            params.push(id_usuario);
+
+            await connection.query(`UPDATE usuarios SET ${updates.join(', ')} WHERE id_usuario = ?`, params);
+        }
+
+        await connection.commit();
         res.json({ success: true, mensaje: "Perfil actualizado correctamente" });
     } catch (error) {
+        if (connection) {
+            await connection.rollback();
+        }
         console.error("Error al actualizar perfil:", error);
         res.status(500).json({ success: false, error: error.message });
+    } finally {
+        if (connection) connection.release();
     }
 };
 

@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/empresasController');
 
-router.get('/perfil', controller.getPerfil);
-router.put('/perfil', controller.updatePerfil);
+router.get('/perfil', controller.getPerfilEmpresa);
+router.put('/perfil', controller.updatePerfilEmpresa);
 
 //CRUD
 router.get('/', controller.getAll);
