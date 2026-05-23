@@ -738,6 +738,102 @@ td a:hover {
     background: var(--blanco);
     box-shadow: 0 0 0 3px rgba(30, 95, 186, 0.12);
 }
+
+/* ================================================
+   BARRA DE PROGRESO DEL PROCESO (5 PASOS)
+   ================================================ */
+
+.progress-tracker {
+    width: 100%;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    padding: 10px 0;
+}
+
+/* Línea conectora de fondo */
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 5%;
+    right: 5%;
+    height: 2px;
+    background: var(--gris-borde);
+    z-index: 1;
+}
+
+/* Línea de progreso activa */
+.progress-steps.active::before {
+    background: linear-gradient(90deg, var(--verde) 0%, var(--azul-medio) 100%);
+}
+
+.progress-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.progress-marker {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--blanco);
+    border: 2px solid var(--gris-borde);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gris-texto);
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.progress-step.active .progress-marker {
+    background: var(--azul-medio);
+    border-color: var(--azul-medio);
+    color: var(--blanco);
+    box-shadow: 0 4px 12px rgba(30, 95, 186, 0.25);
+    transform: scale(1.1);
+}
+
+.progress-step.completed .progress-marker {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: var(--blanco);
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+}
+
+.progress-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    color: #64748b;
+    max-width: 100px;
+    line-height: 1.3;
+    transition: color 0.3s ease;
+}
+
+.progress-step.active .progress-label {
+    color: var(--azul-medio);
+    font-weight: 700;
+}
+
+.progress-step.completed .progress-label {
+    color: var(--verde);
+    font-weight: 700;
+}
+
 /* ================================================
    FIN DE ESTILOS
    ================================================ */

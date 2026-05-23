@@ -21,8 +21,9 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/postulaciones', require('./routes/postulacioneRoutes'));
 app.use('/api/vacantes', require('./routes/vacantesRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/empresas', require('./routes/empresasRoutes'));
+app.use('/api/empresa', require('./routes/empresaRoutes'));
 app.use('/api/estudiantes', require('./routes/estudiantesRoutes'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Ruta al login
 app.get('/', (req, res) => {
