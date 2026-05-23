@@ -1,30 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
+    <title>PractiMatch | Admin</title>
     <link rel="stylesheet" href="../css/estilos.css">
-    <script src="../js/script.js" defer></script>
+    <!-- Scripts Modulares -->
+    <script src="../js/core/utils.js" defer></script>
+    <script src="../js/core/auth.js" defer></script>
+    <script src="../js/modules/admin.js" defer></script>
 </head>
 <body>
-<div class="Paneles">
-    <div class="dashboard">
-        <h1>Panel del Administrador</h1>
-    </div>
-    <div class="cuerpo">
-        <div class="sideMenu">
-            <a href="#" data-section="alumnos">Alumnos</a>
-            <a href="#" data-section="empresas-pendientes">Empresas</a>
-            <a href="#" data-section="solicitudes">Aprobación de vacantes</a>
-            <hr>
-            <button onclick="cerrarSesion()">Cerrar sesión</button>
+    <div class="Paneles">
+        <div class="dashboard">
+            <h1>Panel del Administrador</h1>
         </div>
+        <div class="cuerpo">
+            <nav class="sideMenu">
+                <a href="#" data-section="dashboard" class="activo">Inicio</a>
+                <a href="#" data-section="usuarios">Usuarios</a>
+                <a href="#" data-section="empresas">Empresas</a>
+                <a href="#" data-section="solicitudes">Aprobación de vacantes</a>
+                <a href="#" data-section="validar-documentos">Validación de Documentos</a>
+                <hr>
+                <button class="btn-cerrar" onclick="cerrarSesion()">Cerrar sesión</button>
+            </nav>
 
-        <div class="contenido" id="content-area">
-            <!-- Aquí script.js inyectará las tablas automáticamente -->
+            <main class="contenido" id="content-area">
+                <!-- El contenido se carga dinámicamente vía admin.js -->
+                <div class="loading">Cargando panel...</div>
+            </main>
         </div>
     </div>
-</div>>
 </body>
 </html>

@@ -1,5 +1,17 @@
-// 1. GESTIÓN DE SESIÓN Y AUTENTICACIÓN
+// =====================================================
+// 1. VARIABLES GLOBALES Y UTILIDADES
+// =====================================================
+let procesoAlumnoSeleccionado = null;
 
+// Función vital para evitar problemas de mayúsculas y acentos entre la BD y el Frontend
+function normalizarTexto(texto) {
+    if (!texto) return '';
+    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+// =====================================================
+// 2. GESTIÓN DE SESIÓN Y AUTENTICACIÓN
+// =====================================================
 async function iniciarSesion() {
     const correo = document.getElementById("correo").value.trim();
     const contrasena = document.getElementById("contrasena").value.trim();
@@ -37,15 +49,9 @@ async function cerrarSesion() {
     }
 }
 
-let procesoAlumnoSeleccionado = null;
-const PROCESOS_ALUMNO = {
-    servicio: 'Servicio',
-    practicas: 'Práctica',
-    integrativa: 'Integrativa'
-};
-
-// 2. UTILIDADES DE RENDERIZADO (FRONTEND)
-
+// =====================================================
+// 3. UTILIDADES DE RENDERIZADO TABLAS (FRONTEND)
+// =====================================================
 function crearFilaPostulacion(p) {
     const clases = {
         'Aprobado': 'badge-aprobado',
@@ -87,8 +93,22 @@ async function cargarDatosTabla(endpoint, tableBodyId, filterFn = null, msg = 'S
     }
 }
 
-// 3. SECCIONES DINÁMICAS (DASHBOARD EMPRESA)
+async function cargarDatosTablaGenerica(endpoint, tableBodyId, rowFn, msg = 'Sin datos') {
+    const tabla = document.getElementById(tableBodyId);
+    if (!tabla) return;
+    try {
+        const res = await fetch(endpoint);
+        const json = await res.json();
+        const lista = json.data || [];
+        tabla.innerHTML = lista.length > 0 ? lista.map(rowFn).join('') : `<tr><td colspan="6" style="text-align:center;">${msg}</td></tr>`;
+    } catch (e) {
+        tabla.innerHTML = "<tr><td colspan='6' style='color:red;'>Error al cargar datos</td></tr>";
+    }
+}
 
+// =====================================================
+// 4. SECCIONES DINÁMICAS (DASHBOARD EMPRESA)
+// =====================================================
 function renderRequisitosSection() {
     document.getElementById('content-area').innerHTML = `
     <section class="panel-section">
@@ -105,17 +125,14 @@ function renderRequisitosSection() {
             <option value="Integrativa">Integrativa Profesional</option>
           </select>
         </div>
-
         <div class="form-group">
           <label for="vacante-descripcion">Descripción detallada</label>
           <textarea id="vacante-descripcion" rows="5" required placeholder="Describe las responsabilidades de la vacante..."></textarea>
         </div>
-
         <div class="form-group">
           <label for="vacante-requisitos">Requisitos (opcional)</label>
           <textarea id="vacante-requisitos" rows="3" placeholder="Ej. Ingeniería, inglés, disponibilidad de 6 meses..."></textarea>
         </div>
-
         <div class="form-footer">
           <button type="submit" class="btn-primario">Crear Vacante</button>
           <div id="vacante-message"></div>
@@ -154,12 +171,9 @@ function renderBecariosSection() {
     cargarDatosTabla('/api/postulaciones', 'tabla-becarios', b => b.estatus === 'Aprobado', 'No tienes becarios aprobados');
 }
 
-// 4. LÓGICA DE ENVÍO (BACKEND CONNECT)
-
 async function handleVacanteSubmit(e) {
     e.preventDefault();
     const msg = document.getElementById('vacante-message');
-
     const payload = {
         tipo_proceso: document.getElementById('tipo-proceso').value,
         descripcion: document.getElementById('vacante-descripcion').value.trim(),
@@ -172,7 +186,6 @@ async function handleVacanteSubmit(e) {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
         });
-
         const datos = await res.json();
 
         if (res.ok) {
@@ -183,80 +196,31 @@ async function handleVacanteSubmit(e) {
             msg.innerHTML = `<p class='text-sm text-red-600'>❌ ${datos.error || 'Error al guardar'}</p>`;
         }
     } catch (error) {
-        console.error("Error en la petición:", error);
         msg.innerHTML = "<p class='text-sm text-red-600'>❌ Error de conexión</p>";
     }
 }
 
-// 5. CONTROLADOR DE NAVEGACIÓN Y EVENTOS
-
 function cargarSeccionEmpresa(section) {
-    // Cargar contenido
     const vistas = {
         'requisitos': renderRequisitosSection,
         'solicitudes': renderSolicitudesSection,
         'becarios': renderBecariosSection
     };
-
     if (vistas[section]) vistas[section]();
 }
 
 // =====================================================
-// NAVEGADOR INTELIGENTE UNIFICADO (SPA)
+// 5. SECCIONES DINÁMICAS (DASHBOARD ADMINISTRADOR)
 // =====================================================
-// Un único listener que detecta la página y llama la función correcta
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.sideMenu a').forEach(link => {
-        link.addEventListener('click', (e) => {
-            // Capturar el data-section desde el enlace más cercano
-            const linkElement = e.target.closest('a');
-            if (!linkElement) return;
-            
-            const section = linkElement.dataset.section;
-            if (!section) return;
-            
-            e.preventDefault();
-            
-            // Detectar la página actual y ejecutar la función correcta
-            const path = window.location.pathname;
-            let controllerFunction;
-            
-            if (path.includes('admin_view')) {
-                controllerFunction = cargarSeccionAdmin;
-            } else if (path.includes('dashboardEmpresa')) {
-                controllerFunction = cargarSeccionEmpresa;
-            } else if (path.includes('dashboardAlumno')) {
-                controllerFunction = cargarSeccionAlumno;
-            } else {
-                return; // No ejecutar si no estamos en un dashboard conocido
-            }
-            
-            // Actualizar clase .activo en el menú
-            document.querySelectorAll('.sideMenu a').forEach(a => {
-                a.classList.remove('activo');
-            });
-            linkElement.classList.add('activo');
-            
-            // Ejecutar el controlador específico
-            controllerFunction(section);
-        });
-    });
-});
-
 function cargarSeccionAdmin(section) {
-    // 2. Definir las vistas (Estaban fuera de la función)
     const vistas = {
         'dashboard': renderAdminDashboard,
-        'alumnos': renderAdminUsuarios, // Cambiado de 'usuarios' a 'alumnos' para coincidir con el HTML
+        'alumnos': renderAdminUsuarios,
         'empresas-pendientes': renderAdminEmpresasPendientes,
-        'solicitudes': renderAdminSolicitudes
+        'solicitudes': renderAdminSolicitudes,
+        'validar-documentos': renderAdminDocumentos 
     };
-
-    if (vistas[section]) {
-        vistas[section]();
-    } else {
-        console.warn("Sección no encontrada:", section);
-    }
+    if (vistas[section]) vistas[section]();
 }
 
 function renderAdminDashboard() {
@@ -278,24 +242,8 @@ function renderAdminUsuarios() {
         <tbody id="tabla-admin-usuarios"></tbody>
       </table>
     </div>`;
-
-    // Función personalizada para filas de usuarios
     const rowUser = (u) => `<tr><td>${u.id_usuario}</td><td>${u.nombre}</td><td>${u.correo}</td><td>${u.rol}</td></tr>`;
     cargarDatosTablaGenerica('/api/admin/usuarios', 'tabla-admin-usuarios', rowUser);
-}
-
-// Nueva función de carga genérica para evitar errores
-async function cargarDatosTablaGenerica(endpoint, tableBodyId, rowFn, msg = 'Sin datos') {
-    const tabla = document.getElementById(tableBodyId);
-    if (!tabla) return;
-    try {
-        const res = await fetch(endpoint);
-        const json = await res.json();
-        const lista = json.data || [];
-        tabla.innerHTML = lista.length > 0 ? lista.map(rowFn).join('') : `<tr><td colspan="5">${msg}</td></tr>`;
-    } catch (e) {
-        tabla.innerHTML = "<tr><td colspan='5' style='color:red;'>Error al cargar datos</td></tr>";
-    }
 }
 
 function renderAdminSolicitudes() {
@@ -304,26 +252,12 @@ function renderAdminSolicitudes() {
       <h2>Solicitudes Globales (Dashboard)</h2>
       <table>
         <thead>
-          <tr>
-            <th>Usuario</th>
-            <th>Vacante</th>
-            <th>Estado</th>
-          </tr>
+          <tr><th>Usuario</th><th>Vacante</th><th>Estado</th></tr>
         </thead>
         <tbody id="tabla-admin-dashboard"></tbody>
       </table>
     </div>`;
-
-    // Definimos cómo se ve la fila para los datos del Admin
-    const rowAdminDashboard = (p) => `
-        <tr>
-            <td>${p.correo}</td>
-            <td>${p.vacante_titulo}</td>
-            <td><span class="badge badge-revision">${p.estatus}</span></td>
-        </tr>
-    `;
-
-    // USAMOS LA GENÉRICA
+    const rowAdminDashboard = (p) => `<tr><td>${p.correo}</td><td>${p.vacante_titulo}</td><td><span class="badge badge-revision">${p.estatus}</span></td></tr>`;
     cargarDatosTablaGenerica('/api/admin/dashboard', 'tabla-admin-dashboard', rowAdminDashboard);
 }
 
@@ -338,7 +272,6 @@ function renderAdminEmpresasPendientes() {
         <tbody id="tabla-empresas-pendientes"></tbody>
       </table>
     </div>`;
-
     const rowEmpresa = (e) => `
         <tr>
             <td>${e.id_empresa}</td>
@@ -349,46 +282,115 @@ function renderAdminEmpresasPendientes() {
                 <button class="btn-peligro" onclick="cambiarEstadoEmpresa(${e.id_empresa}, 'RECHAZADO')">X</button>
             </td>
         </tr>`;
-
     cargarDatosTablaGenerica('/api/admin/empresas/pendientes', 'tabla-empresas-pendientes', rowEmpresa);
 }
 
 async function cambiarEstadoEmpresa(id, nuevoEstado) {
     if(!confirm(`¿Seguro que quieres cambiar el estado a ${nuevoEstado}?`)) return;
-
     try {
         const res = await fetch(`/api/admin/empresas/estado`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_empresa: id, estado: nuevoEstado })
         });
-
         const data = await res.json();
         if (data.success) {
             alert("Estado actualizado");
-            renderAdminEmpresasPendientes(); // Recargamos la tabla para que desaparezca de "pendientes"
+            renderAdminEmpresasPendientes();
         }
     } catch (e) {
         console.error("Error al actualizar:", e);
     }
 }
 
-// 6. PERFIL DE EMPRESAS (POP UP)
+function renderAdminDocumentos() {
+    document.getElementById('content-area').innerHTML = `
+    <div class="panel-section">
+      <h2>Validación de Documentos de Alumnos</h2>
+      <p class="section-subtitle">Revisa los expedientes cargados por los estudiantes activos.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Alumno / Matrícula</th>
+            <th>Proceso</th>
+            <th>Documento</th>
+            <th>Fecha Subida</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-admin-documentos"></tbody>
+      </table>
+    </div>`;
 
+    const rowDocumento = (doc) => {
+        let claseBadge = 'badge-pendiente';
+        if (doc.estado === 'Aprobado') claseBadge = 'badge-aprobado';
+        if (doc.estado === 'Rechazado') claseBadge = 'badge-rechazado';
+
+        const fechaFormateada = doc.fecha_subida ? new Date(doc.fecha_subida).toLocaleDateString() : 'N/A';
+
+        return `
+        <tr>
+            <td>
+                <strong>${doc.nombre_alumno}</strong><br>
+                <span style="font-size: 0.85em; color: gray;">Matrícula: ${doc.matricula}</span>
+            </td>
+            <td>${doc.tipo_proceso || 'General'}</td>
+            <td><strong>${doc.nombre_documento}</strong></td>
+            <td>${fechaFormateada}</td>
+            <td><span class="badge ${claseBadge}">${doc.estado}</span></td>
+            <td>
+                <a href="${doc.ruta_archivo}" target="_blank" class="btn-primario" style="text-decoration:none; padding: 4px 8px; font-size:0.9em; display:inline-block; margin-bottom:2px;">Ver Archivo</a>
+                <button class="btn-subir" style="background-color: #2ecc71; margin-bottom:2px;" onclick="cambiarEstadoDocumento(${doc.id_documento}, 'Aprobado')">✓</button>
+                <button class="btn-peligro" onclick="cambiarEstadoDocumento(${doc.id_documento}, 'Rechazado')">✗</button>
+            </td>
+        </tr>`;
+    };
+    cargarDatosTablaGenerica('/api/admin/documentos', 'tabla-admin-documentos', rowDocumento, 'No hay documentos cargados en el sistema.');
+}
+
+async function cambiarEstadoDocumento(idDocumento, nuevoEstado) {
+    let comentario = null;
+    if (nuevoEstado === 'Rechazado') {
+        comentario = prompt("Escribe el motivo del rechazo del documento (este mensaje lo verá el alumno):");
+        if (comentario === null) return;
+        if (comentario.trim() === "") return alert("Debes indicar un motivo de rechazo obligatoriamente.");
+    } else {
+        if (!confirm("¿Estás seguro de marcar este documento como APROBADO?")) return;
+    }
+
+    try {
+        const res = await fetch('/api/admin/documentos/estado', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_documento: idDocumento, estado: nuevoEstado, comentario_rechazo: comentario })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+            alert(`Documento marcado como ${nuevoEstado}`);
+            renderAdminDocumentos();
+        } else {
+            alert("Error al actualizar: " + (data.error || 'Inténtalo de nuevo'));
+        }
+    } catch (e) {
+        alert("Ocurrió un error al procesar la solicitud.");
+    }
+}
+
+// =====================================================
+// 6. PERFIL DE EMPRESAS (POP UP)
+// =====================================================
 async function cargarPerfilEmpresa() {
     try {
         const res = await fetch('/api/empresas/perfil');
-
         if (!res.ok) {
             const errorData = await res.json();
-            alert(`⚠️ Error: ${errorData.mensaje || 'No se encontró el perfil de empresa'}`);
-            return;
+            return alert(`⚠️ Error: ${errorData.mensaje || 'No se encontró el perfil'}`);
         }
-
         const resJson = await res.json();
         if (resJson.success && resJson.data) {
             const data = resJson.data;
-
             document.getElementById('perfil-nombre').value = data.nombre_empresa || '';
             document.getElementById('perfil-rfc').value = data.rfc || '';
             document.getElementById('perfil-correo').value = data.correo || '';
@@ -399,14 +401,11 @@ async function cargarPerfilEmpresa() {
             document.getElementById('modal-perfil').style.display = 'flex';
         }
     } catch (error) {
-        console.error("Error crítico en el modal de empresa:", error);
-        alert("No se pudo conectar con el servidor. Revisa la consola de Node.js");
+        alert("No se pudo conectar con el servidor.");
     }
 }
 
-function abrirModalPerfil() {
-    cargarPerfilEmpresa();
-}
+function abrirModalPerfil() { cargarPerfilEmpresa(); }
 
 function habilitarEdicion() {
     document.getElementById('perfil-nombre').disabled = false;
@@ -426,52 +425,107 @@ function deshabilitarEdicion() {
     document.getElementById('btn-guardar-perfil').style.display = 'none';
 }
 
-function cerrarModalPerfil() {
-    document.getElementById('modal-perfil').style.display = 'none';
-}
+function cerrarModalPerfil() { document.getElementById('modal-perfil').style.display = 'none'; }
 
 // =====================================================
 // 7. SECCIONES DEL ALUMNO (DASHBOARD ESTUDIANTE)
 // =====================================================
+async function verificarEstatusProcesoAlumno() {
+    try {
+        const res = await fetch('/api/estudiantes/perfil');
+        if (!res.ok) return; 
+        const json = await res.json();
+        if (json.success && json.data) {
+            procesoAlumnoSeleccionado = json.data.tipo_proceso || null;
+            if(procesoAlumnoSeleccionado) {
+                ajustarMenuLateral(procesoAlumnoSeleccionado);
+            }
+        }
+    } catch (e) {
+        console.error("Error consultando proceso del alumno:", e);
+    }
+}
 
-// Documentos iniciales - Vista por defecto
-function renderDocumentosSection() {
-    const proceso = procesoAlumnoSeleccionado;
+async function renderDocumentosSection() {
+    // Para renderizar, usamos la variable normalizada si existe
+    const procesoNorm = normalizarTexto(procesoAlumnoSeleccionado);
     let titulo = 'Documentos Iniciales';
-    let documentos = [
-        { nombre: 'INE', estado: 'Aprobado' },
-        { nombre: 'CURP', estado: 'Pendiente' },
-        { nombre: 'Comprobante de domicilio', estado: 'Pendiente' },
-        { nombre: 'Vigencia de seguro facultativo', estado: 'Pendiente' }
+    let documentosRequeridos = [
+        { nombre: 'INE' },
+        { nombre: 'CURP' },
+        { nombre: 'Comprobante de domicilio' },
+        { nombre: 'Vigencia de seguro facultativo' }
     ];
-    let mensajeExtra = 'Selecciona un proceso para filtrar vacantes y adaptar los documentos requeridos.';
+    let mensajeExtra = 'Selecciona un proceso para adaptar los documentos requeridos.';
 
-    if (proceso === 'Servicio') {
+    if (procesoNorm.includes('servicio')) {
         titulo = 'Documentos requeridos para Servicio Social';
-        documentos = [
-            { nombre: 'Carta Presentación', estado: 'Pendiente' },
-            { nombre: 'Carta Compromiso', estado: 'Pendiente' },
-            { nombre: 'Constancia de Término', estado: 'Pendiente' }
+        documentosRequeridos = [
+            { nombre: 'Carta Presentación' },
+            { nombre: 'Carta Compromiso' },
+            { nombre: 'Constancia de Término' }
         ];
-        mensajeExtra = 'Para Servicio Social se requieren los documentos indicados. Súbelos cuando tengas todo listo.';
-    } else if (proceso === 'Práctica' || proceso === 'Integrativa') {
-        titulo = `Documentos requeridos para ${proceso}`;
-        documentos = [
-            { nombre: 'Carta Presentación', estado: 'Pendiente' },
-            { nombre: 'Carta Compromiso', estado: 'Pendiente' },
-            { nombre: 'Valoración', estado: 'Pendiente' },
-            { nombre: 'Constancia de Término', estado: 'Pendiente' }
+        mensajeExtra = 'Para Servicio Social se requieren los documentos indicados.';
+    } else if (procesoNorm.includes('practica') || procesoNorm.includes('integrativa')) {
+        titulo = `Documentos requeridos para ${procesoAlumnoSeleccionado || 'tu proceso'}`;
+        documentosRequeridos = [
+            { nombre: 'Carta Presentación' },
+            { nombre: 'Carta Compromiso' },
+            { nombre: 'Valoración' },
+            { nombre: 'Constancia de Término' }
         ];
-        mensajeExtra = `Para ${proceso} se requieren los documentos indicados. Súbelos cuando tengas todo listo.`;
+        mensajeExtra = `Para tu proceso se requieren los documentos indicados.`;
     }
 
-    const filas = documentos.map(doc => {
-        const claseBadge = doc.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente';
+    let documentosSubidos = [];
+    try {
+        const res = await fetch('/api/estudiantes/mis-documentos'); 
+        if (res.ok) {
+            const json = await res.json();
+            documentosSubidos = json.data || [];
+        }
+    } catch (e) {
+        console.warn("No se pudieron cargar los documentos.");
+    }
+
+    // Comparamos usando la función normalizarTexto para evitar errores de escritura BD vs Frontend
+    const todosAprobados = documentosRequeridos.every(req => {
+        const docSubido = documentosSubidos.find(d => normalizarTexto(d.nombre_documento) === normalizarTexto(req.nombre));
+        return docSubido && docSubido.estado === 'Aprobado';
+    });
+
+    let alertaValidacion = '';
+    if (todosAprobados && documentosRequeridos.length > 0) {
+        alertaValidacion = `
+            <div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #c3e6cb; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.5em;">✅</span>
+                <strong>¡Felicidades! Todos tus documentos han sido validados y aprobados por la administración.</strong>
+            </div>
+        `;
+    }
+
+    const filas = documentosRequeridos.map(req => {
+        const docSubido = documentosSubidos.find(d => normalizarTexto(d.nombre_documento) === normalizarTexto(req.nombre));
+        const estadoFinal = docSubido ? docSubido.estado : 'No subido';
+        
+        let claseBadge = 'badge-pendiente';
+        if (estadoFinal === 'Aprobado') claseBadge = 'badge-aprobado';
+        if (estadoFinal === 'Rechazado') claseBadge = 'badge-rechazado';
+        if (estadoFinal === 'No subido') claseBadge = 'badge-nuevo'; 
+
+        // 👉 CORRECCIÓN: Si ya está subido (Aprobado, Pendiente o En revisión), ocultamos el botón de subir
+        let btnSubirHtml = '';
+        if (estadoFinal === 'Aprobado' || estadoFinal === 'Pendiente' || estadoFinal === 'En revisión') {
+            btnSubirHtml = `<span style="color:gray; font-size:0.85em; font-weight: bold;">Subido (${estadoFinal})</span>`;
+        } else {
+            btnSubirHtml = `<button class="btn-subir" type="button" onclick="handleSubirDocumento('${req.nombre}')">Subir Archivo</button>`;
+        }
+
         return `
             <tr>
-                <td>${doc.nombre}</td>
-                <td><span class="badge ${claseBadge}">${doc.estado}</span></td>
-                <td><button class="btn-subir" type="button" onclick="handleSubirDocumento('${doc.nombre}')">Subir</button></td>
+                <td>${req.nombre}</td>
+                <td><span class="badge ${claseBadge}">${estadoFinal}</span></td>
+                <td>${btnSubirHtml}</td>
             </tr>
         `;
     }).join('');
@@ -480,58 +534,48 @@ function renderDocumentosSection() {
         <div class="panel-section">
             <h2>${titulo}</h2>
             <p class="info-adicional">${mensajeExtra}</p>
+            ${alertaValidacion}
             <div class="tabla-contenedor">
                 <table>
                     <thead>
-                        <tr>
-                            <th>Documento</th>
-                            <th>Estado</th>
-                            <th>Acción</th>
-                        </tr>
+                        <tr><th>Documento</th><th>Estado</th><th>Acción</th></tr>
                     </thead>
-                    <tbody>
-                        ${filas}
-                    </tbody>
+                    <tbody>${filas}</tbody>
                 </table>
             </div>
         </div>
     `;
 }
 
-// Vacantes disponibles
-function renderVacantesAlumnoSection() {
-    const titulo = procesoAlumnoSeleccionado ? `Vacantes de ${procesoAlumnoSeleccionado}` : 'Vacantes Disponibles';
-    const filtro = procesoAlumnoSeleccionado ? `<p class="info-adicional">Mostrando solo vacantes de ${procesoAlumnoSeleccionado}.</p>` : '';
-
+// 👉 CORRECCIÓN: Ahora le pasamos el filtro explícito a la sección de vacantes
+function renderVacantesAlumnoSection(tipoFiltro) {
+    const titulo = `Vacantes de ${tipoFiltro}`;
     document.getElementById('content-area').innerHTML = `
         <div class="panel-section">
             <h2>${titulo}</h2>
-            ${filtro}
+            <p class="info-adicional">Mostrando las vacantes registradas para ${tipoFiltro}.</p>
             <table>
                 <thead>
-                    <tr>
-                        <th>Tipo</th>
-                        <th>Empresa</th>
-                        <th>Descripción</th>
-                        <th>Acción</th>
-                    </tr>
+                    <tr><th>Tipo</th><th>Empresa</th><th>Descripción</th><th>Acción</th></tr>
                 </thead>
                 <tbody id="tabla-vacantes-alumno"></tbody>
             </table>
         </div>
     `;
-    cargarVacantesParaAlumno();
+    cargarVacantesParaAlumno(tipoFiltro);
 }
 
-async function cargarVacantesParaAlumno() {
+async function cargarVacantesParaAlumno(tipoFiltro) {
     const tabla = document.getElementById('tabla-vacantes-alumno');
+    if (!tabla) return;
     try {
         const res = await fetch('/api/vacantes');
         const json = await res.json();
         let vacantes = json.data || [];
 
-        if (procesoAlumnoSeleccionado) {
-            vacantes = vacantes.filter(v => v.tipo_proceso === procesoAlumnoSeleccionado);
+        // Filtramos usando la normalización
+        if (tipoFiltro) {
+            vacantes = vacantes.filter(v => normalizarTexto(v.tipo_proceso).includes(normalizarTexto(tipoFiltro)));
         }
 
         tabla.innerHTML = vacantes.length > 0 
@@ -543,60 +587,39 @@ async function cargarVacantesParaAlumno() {
                     <td><button class="btn-primario" onclick="postularseAVacante(${v.id_vacante})">Postularse</button></td>
                 </tr>
             `).join('')
-            : `<tr><td colspan="4" style="text-align:center;">No hay vacantes disponibles${procesoAlumnoSeleccionado ? ' para el proceso seleccionado' : ''}</td></tr>`;
+            : `<tr><td colspan="4" style="text-align:center;">No hay vacantes disponibles para este proceso.</td></tr>`;
     } catch (error) {
         tabla.innerHTML = "<tr><td colspan='4' style='color:red;'>Error al cargar vacantes</td></tr>";
     }
 }
 
-// Secciones próximamente
-function renderServicioSection() {
-    procesoAlumnoSeleccionado = 'Servicio';
-    renderVacantesAlumnoSection();
-}
+// Redireccionamos a la función genérica con el nombre exacto
+function renderServicioSection() { renderVacantesAlumnoSection('Servicio'); }
+function renderPracticasSection() { renderVacantesAlumnoSection('Práctica'); }
+function renderIntegrativaSection() { renderVacantesAlumnoSection('Integrativa'); }
+function renderPerfilSection() { abrirModalPerfilAlumno(); }
 
-function renderIntegrativaSection() {
-    procesoAlumnoSeleccionado = 'Integrativa';
-    renderVacantesAlumnoSection();
-}
-
-function renderPracticasSection() {
-    procesoAlumnoSeleccionado = 'Práctica';
-    renderVacantesAlumnoSection();
-}
-
-function renderPerfilSection() {
-    abrirModalPerfilAlumno();
-}
-
-// Controlador de navegación del alumno
 function cargarSeccionAlumno(section) {
     const vistas = {
         'documentos': renderDocumentosSection,
-        'vacantes': renderVacantesAlumnoSection,
         'servicio': renderServicioSection,
-        'integrativa': renderIntegrativaSection,
         'practicas': renderPracticasSection,
+        'integrativa': renderIntegrativaSection,
         'perfil': renderPerfilSection
     };
-
     if (vistas[section]) vistas[section]();
 }
 
 // =====================================================
 // 8. MODAL DE PERFIL DEL ALUMNO
 // =====================================================
-
 async function abrirModalPerfilAlumno() {
     try {
         const res = await fetch('/api/estudiantes/perfil');
         const resJson = await res.json();
 
-        // Verificamos que success sea true Y que existan los datos
         if (resJson.success && resJson.data) {
             const est = resJson.data;
-            
-            // Usamos verificaciones para evitar el error de "undefined"
             document.getElementById('perfil-id-estudiante').value = est.id_estudiante || '';
             document.getElementById('perfil-matricula').value = est.matricula || '';
             document.getElementById('perfil-carrera').value = est.carrera || '';
@@ -606,13 +629,8 @@ async function abrirModalPerfilAlumno() {
 
             deshabilitarEdicionPerfilAlumno();
             document.getElementById('modal-perfil-alumno').style.display = 'flex';
-        } else {
-            // Si el backend responde pero dice que no hubo éxito
-            alert("⚠️ No se encontraron datos para tu perfil de estudiante.");
-            console.error("Respuesta del servidor:", resJson);
         }
     } catch (error) {
-        console.error("Error al obtener perfil:", error);
         alert("Ocurrió un error al conectar con el servidor.");
     }
 }
@@ -631,13 +649,51 @@ function deshabilitarEdicionPerfilAlumno() {
     document.getElementById('btn-guardar-perfil-alumno').style.display = 'none';
 }
 
-function cerrarModalPerfilAlumno() {
-    document.getElementById('modal-perfil-alumno').style.display = 'none';
+function cerrarModalPerfilAlumno() { document.getElementById('modal-perfil-alumno').style.display = 'none'; }
+
+// =====================================================
+// 9. INTERCEPCIÓN Y ENVÍO DE DOCUMENTOS (MULTER)
+// =====================================================
+function handleSubirDocumento(nombreDocumento) {
+    const inputTemporal = document.getElementById('nombre-documento-temporal');
+    if (inputTemporal) inputTemporal.value = nombreDocumento;
+
+    const inputArchivoGlobal = document.getElementById('input-archivo-global');
+    if (inputArchivoGlobal) {
+        inputArchivoGlobal.value = ''; 
+        inputArchivoGlobal.click();
+    }
 }
 
-// Funciones auxiliares del alumno
-function handleSubirDocumento(nombreDocumento) {
-    alert(`Funcionalidad de subida de ${nombreDocumento} próximamente`);
+async function procesarArchivoSeleccionado(input) {
+    if (!input.files || input.files.length === 0) return;
+
+    const archivo = input.files[0];
+    const nombreDocumento = document.getElementById('nombre-documento-temporal').value;
+
+    if (!nombreDocumento) return alert("Error: No se identificó el documento a subir.");
+    if (archivo.size > 5 * 1024 * 1024) return alert("El archivo excede el límite permitido de 5MB.");
+
+    const formData = new FormData();
+    formData.append('nombreDocumento', nombreDocumento); 
+    formData.append('archivo', archivo);
+
+    try {
+        const respuesta = await fetch('/api/estudiantes/subir-documento', {
+            method: 'POST',
+            body: formData 
+        });
+        const resultado = await respuesta.json();
+
+        if (respuesta.ok && resultado.success) {
+            alert(`✅ ¡Excelente! Documento cargado con éxito.`);
+            renderDocumentosSection();
+        } else {
+            alert(`❌ Error al subir: ${resultado.error || 'Inténtalo de nuevo'}`);
+        }
+    } catch (error) {
+        alert("❌ Error de red: No se pudo conectar con el servidor.");
+    }
 }
 
 async function postularseAVacante(idVacante) {
@@ -654,46 +710,22 @@ async function postularseAVacante(idVacante) {
         const data = await res.json();
         if (res.ok) {
             alert("✅ Te has postulado correctamente");
-            cargarVacantesParaAlumno();
+            // Refresca la vista en la que nos encontremos
+            cargarSeccionAlumno(document.querySelector('.sideMenu a.activo')?.getAttribute('data-section') || 'servicio');
         } else {
             alert("❌ Error: " + (data.error || 'No se pudo completar la postulación'));
         }
     } catch (error) {
-        console.error("Error:", error);
         alert("Error al postularse");
     }
 }
 
-/*
-// Guardar cambios
-document.getElementById('form-perfil-empresa').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const payload = {
-        nombre_empresa: document.getElementById('perfil-nombre').value,
-        rfc: document.getElementById('perfil-rfc').value
-    };
-
-    try {
-        const res = await fetch('/api/empresas/perfil', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (res.ok) {
-            alert("Perfil actualizado correctamente");
-            deshabilitarEdicion();
-            cerrarModalPerfil();
-        }
-    } catch (error) {
-        alert("Error al actualizar");
-    }
-});*/
-// Guardar cambios - PROTEGIDO PARA SPA
-const formPerfil = document.getElementById('form-perfil-empresa');
-
-if (formPerfil) { // Solo se ejecuta si el formulario existe (Vista Empresa)
-    formPerfil.addEventListener('submit', async (e) => {
+// =====================================================
+// 10. FORM SUBMITS (SPA PERSISTENCIA)
+// =====================================================
+const formPerfilEmpresa = document.getElementById('form-perfil-empresa');
+if (formPerfilEmpresa) {
+    formPerfilEmpresa.addEventListener('submit', async (e) => {
         e.preventDefault();
         const payload = {
             nombre_empresa: document.getElementById('perfil-nombre').value,
@@ -708,32 +740,121 @@ if (formPerfil) { // Solo se ejecuta si el formulario existe (Vista Empresa)
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload)
             });
-
             if (res.ok) {
                 alert("Perfil actualizado correctamente");
                 deshabilitarEdicion();
                 cerrarModalPerfil();
             } else {
                 const data = await res.json();
-                alert(`Error al actualizar: ${data.mensaje || data.error || 'Error desconocido'}`);
+                alert(`Error al actualizar: ${data.mensaje || 'Error desconocido'}`);
             }
         } catch (error) {
-            console.error('Error al actualizar perfil de empresa:', error);
             alert("Error al actualizar");
         }
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const path = window.location.pathname;
+const formPerfilAlumno = document.getElementById('form-perfil-alumno');
+if (formPerfilAlumno) {
+    formPerfilAlumno.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            rfc: document.getElementById('perfil-rfc').value.trim(),
+            nombre: document.getElementById('perfil-nombre').value.trim()
+        };
+
+        try {
+            const res = await fetch('/api/estudiantes/perfil', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                alert("¡Perfil de estudiante actualizado con éxito!");
+                deshabilitarEdicionPerfilAlumno();
+                cerrarModalPerfilAlumno();
+            } else {
+                const data = await res.json();
+                alert(`Error al actualizar perfil: ${data.mensaje}`);
+            }
+        } catch (error) {
+            alert("Error técnico al guardar los cambios.");
+        }
+    });
+}
+
+// =====================================================
+// 11. ROUTER INICIALIZADOR Y LÓGICA DE MENÚS
+// =====================================================
+
+// 👉 CORRECCIÓN: Validación a prueba de balas para mostrar/ocultar el menú
+function ajustarMenuLateral(proceso) {
+    if (!proceso) return;
     
-    if (path.includes('admin_view')) {
+    const normProceso = normalizarTexto(proceso);
+    let seccionPermitida = '';
+
+    // Determinamos el string interno basado en el dato normalizado de la BD
+    if (normProceso.includes('servicio')) seccionPermitida = 'servicio';
+    else if (normProceso.includes('practica')) seccionPermitida = 'practicas';
+    else if (normProceso.includes('integrativa')) seccionPermitida = 'integrativa';
+
+    const itemsMenu = document.querySelectorAll('.sideMenu a[data-section]');
+    
+    itemsMenu.forEach(item => {
+        const section = item.getAttribute('data-section');
+        
+        if (['servicio', 'practicas', 'integrativa'].includes(section)) {
+            // Solo mostramos la sección que coincide con el proceso del alumno
+            if (section === seccionPermitida) {
+                item.style.display = 'block'; 
+            } else {
+                item.style.display = 'none';  
+            }
+        } else {
+            // Secciones globales como documentos o perfil se quedan
+            item.style.display = 'block'; 
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Intentar precargar el proceso del alumno
+    await verificarEstatusProcesoAlumno();
+
+    // 2. Capturar clics de los menús
+    const sideMenu = document.querySelector('.sideMenu');
+    if (sideMenu) {
+        sideMenu.addEventListener('click', (e) => {
+            const target = e.target.closest('a');
+            if (!target) return;
+
+            const section = target.getAttribute('data-section');
+            if (!section) return;
+
+            e.preventDefault();
+
+            // Gestiona el resaltado visual del menú
+            sideMenu.querySelectorAll('a').forEach(a => a.classList.remove('activo'));
+            target.classList.add('activo');
+
+            // Enrutador
+            if (window.location.href.includes('admin_view')) {
+                cargarSeccionAdmin(section);
+            } else if (window.location.href.includes('dashboardEmpresa')) {
+                cargarSeccionEmpresa(section);
+            } else if (window.location.href.includes('dashboardAlumno')) {
+                cargarSeccionAlumno(section);
+            }
+        });
+    }
+
+    // 3. Cargas por defecto
+    if (window.location.href.includes('admin_view')) {
         cargarSeccionAdmin('dashboard');
-    } 
-    else if (path.includes('dashboardEmpresa')) {
-        cargarSeccionEmpresa('requisitos');
-    } 
-    else if (path.includes('dashboardAlumno')) {
-        cargarSeccionAlumno('documentos'); // Esto asegura que el alumno vea sus documentos
+    } else if (window.location.href.includes('dashboardEmpresa')) {
+        cargarSeccionEmpresa('solicitudes');
+    } else if (window.location.href.includes('dashboardAlumno')) {
+        cargarSeccionAlumno('documentos');
     }
 });

@@ -41,8 +41,15 @@ exports.create = (table, fields) => async (req, res) => {
 // UPDATE
 exports.update = (table, idField, fields) => async (req, res) => {
     try {
-        const values = fields.map(f => req.body[f]);
-        const setClause = fields.map(f => `${f}=?`).join(',');
+        // Filtramos solo los campos autorizados que SÍ vienen presentes en el body
+        const camposPresentes = fields.filter(f => req.body[f] !== undefined);
+
+        if (camposPresentes.length === 0) {
+            return res.status(400).json({ success: false, mensaje: "No se proporcionaron campos válidos para actualizar." });
+        }
+
+        const values = camposPresentes.map(f => req.body[f]);
+        const setClause = camposPresentes.map(f => `${f}=?`).join(',');
         
         await db.query(
             `UPDATE ${table} SET ${setClause} WHERE ${idField}=?`,

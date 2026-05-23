@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empresa</title>
+    <title>PractiMatch | Empresa</title>
     <link rel="stylesheet" href="../css/estilos.css">
-    <script src="../js/script.js" defer></script>
+    <script src="../js/core/utils.js" defer></script>
+    <script src="../js/core/auth.js" defer></script>
+    <script src="../js/modules/empresa.js" defer></script>
 </head>
 <body>
     <div class="Paneles">
@@ -17,11 +19,10 @@
                 <a href="#" data-section="requisitos">Publicar</a>
                 <a href="#" data-section="solicitudes">Solicitudes</a>
                 <a href="#" data-section="becarios">Becarios</a>
+                <a href="#" data-section="mis-vacantes">Mis Vacantes</a>
                 <hr>
-                <a href="#" onclick="abrirModalPerfil()">
-                    <i class="fas fa-user"></i> Perfil
-                </a>
-                <a href="#">Mural de vacantes</a>
+                <!-- Ajustado para evitar recargas de página -->
+                <a href="#" onclick="event.preventDefault(); abrirModalPerfil()">Perfil</a>
                 <hr>
                 <button onclick="cerrarSesion()">Cerrar sesión</button>
             </div>
@@ -31,47 +32,31 @@
         </div>
     </div>
 
-<!-- Modal para editar perfil de empresa -->
-
-<div id="modal-perfil" class="modal-overlay" style="display:none;">
-    <div class="modal-content">
-        <span class="close-btn" onclick="cerrarModalPerfil()">&times;</span>
-        <h2>Perfil de Empresa</h2>
-        <hr>
-        <form id="form-perfil-empresa">
-            <div class="form-section">
+    <!-- Modal Perfil Empresa -->
+    <div id="modal-perfil" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <span class="close-btn" onclick="cerrarModalPerfil()">&times;</span>
+            <h2>Perfil de Empresa</h2>
+            <hr>
+            <form id="form-perfil-empresa">
                 <div class="form-group">
                     <label>Nombre de la Empresa</label>
                     <input type="text" id="perfil-nombre" name="nombre_empresa" disabled required />
                 </div>
-
                 <div class="form-group">
                     <label>RFC</label>
                     <input type="text" id="perfil-rfc" name="rfc" disabled required />
                 </div>
-
                 <div class="form-group">
                     <label>Correo de contacto</label>
                     <input type="email" id="perfil-correo" name="correo" disabled required />
                 </div>
-
-                <div class="form-group">
-                    <label>Nombre del contacto</label>
-                    <input type="text" id="perfil-contacto" name="nombre" disabled required />
+                <div class="modal-footer">
+                    <button type="button" id="btn-editar-activar" onclick="habilitarEdicion(true)" class="btn-secundario">Editar Datos</button>
+                    <button type="submit" id="btn-guardar-perfil" class="btn-primario" style="display:none;">Guardar Cambios</button>
                 </div>
-
-                <div class="form-group">
-                    <label>Estado de Registro</label>
-                    <span id="perfil-estado" class="badge"></span>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" id="btn-editar-activar" onclick="habilitarEdicion()" class="btn-secundario">Editar Datos</button>
-                <button type="submit" id="btn-guardar-perfil" class="btn-primario" style="display:none;">Guardar Cambios</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 </body>
 </html>
